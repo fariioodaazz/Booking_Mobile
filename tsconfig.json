@@ -1,6 +1,17 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@lib/*": ["src/lib/*"],
+      "@shared/*": ["src/shared/*"],
+      "@features/*": ["src/features/*"]
+    },
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src"],
+  "exclude": ["src/main.tsx", "src/web"]
 }

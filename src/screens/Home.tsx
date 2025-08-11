@@ -1,21 +1,30 @@
+// src/screens/Home.tsx
 import React from "react";
-import styled from "styled-components/native";
-import { BookingList } from "@features/booking/components/BookingList";
+import { Button } from "../shared/components/Button/Button";
+import { SafeAreaView } from "react-native";
 
-const Wrap = styled.View`
-  flex: 1;
-  padding: 24px;
-`;
+import styled, { DefaultTheme } from "styled-components/native";
+import "styled-components";
 
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 16px;
-`;
+declare module "styled-components" {
+  export interface DefaultTheme {
+    spacing: (factor: number) => number;
+  }
+}
 
-export const Home: React.FC = () => (
-  <Wrap>
-    <Title>Home</Title>
-    <BookingList />
-  </Wrap>
-);
+type Props = {
+  onBookCourt: () => void;
+  onLogout: () => void;
+};
+
+
+export const Home: React.FC<Props> = ({ onBookCourt, onLogout }) => {
+  return (
+    <>
+          <Button title="Book a court" onPress={onBookCourt} variant="primary" size="lg" fullWidth />
+          <Button title="Logout" onPress={onLogout} variant="outline" size="md" fullWidth />
+    </>
+  );
+};
+
+export default Home;

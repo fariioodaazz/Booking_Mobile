@@ -4,7 +4,10 @@ import { AppProviders } from "src/app/providers";
 import { apolloClient } from "src/lib/apollo/client";
 import Login from "src/screens/Login";
 import Home from "src/screens/Home";
-import { RegulationsScreen } from "src/screens/Regulations";
+import { RegulationsScreen } from "src/features/regulations/components/RegulationsScreen";
+import { ThemeProvider } from "styled-components/native";
+import { theme } from "src/shared/styles/theme";
+
 
 type Route = "home" | "regulations";
 
@@ -31,18 +34,19 @@ export default function App() {
   if (hasToken === null) return null;
 
   return (
-    <AppProviders>
-      {hasToken ? (
-        route === "home" ? (
-          <Home
-            onBookCourt={() => setRoute("regulations")}
+    <ThemeProvider theme={theme}>
+      <AppProviders>
+        {hasToken ? (
+          route === "home" ? (
+            <Home
+              onBookCourt={() => setRoute("regulations")}
             onLogout={handleLogout}
           />
         ) : (
           <RegulationsScreen
             facilityId={DEFAULT_FACILITY_ID}
             onShowReservations={() => {/* navigate to your reservations flow if you want */}}
-            onReserve={() => {/* navigate to reserve flow */}}
+            onReserve={() => setRoute("home")}
             onBackHome={() => setRoute("home")}
           />
         )
@@ -50,5 +54,6 @@ export default function App() {
         <Login onLoggedIn={() => setHasToken(true)} />
       )}
     </AppProviders>
+    </ThemeProvider>
   );
 }

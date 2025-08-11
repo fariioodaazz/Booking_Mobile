@@ -3,14 +3,10 @@ import React from "react";
 import { Button } from "../shared/components/Button/Button";
 import { SafeAreaView } from "react-native";
 
-import styled, { DefaultTheme } from "styled-components/native";
-import "styled-components";
+import styled from "styled-components/native";
+import {theme} from "../shared/styles/theme";
+import { ThemeProvider } from 'styled-components/native';
 
-declare module "styled-components" {
-  export interface DefaultTheme {
-    spacing: (factor: number) => number;
-  }
-}
 
 type Props = {
   onBookCourt: () => void;
@@ -20,10 +16,10 @@ type Props = {
 
 export const Home: React.FC<Props> = ({ onBookCourt, onLogout }) => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
           <Button title="Book a court" onPress={onBookCourt} variant="primary" size="lg" fullWidth />
           <Button title="Logout" onPress={onLogout} variant="outline" size="md" fullWidth />
-    </>
+    </ThemeProvider>
   );
 };
 

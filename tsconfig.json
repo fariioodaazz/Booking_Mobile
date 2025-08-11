@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "src/shared/types/styled.d.ts"],
   "exclude": ["src/main.tsx", "src/web"]
 }

@@ -3,16 +3,13 @@ import styled from "styled-components/native";
 import { useMyBookings } from "../hooks/useMyBookings";
 import { FlatList } from "react-native";
 import { theme } from "../../../shared/styles/theme";
+import { View } from "react-native";
 
-const Wrap = styled.View`
-  padding: ${theme.spacing(6)}px;
-`;
 
 const HeaderRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${theme.spacing(3)}px;
 `;
 
 const Title = styled.Text`
@@ -21,7 +18,6 @@ const Title = styled.Text`
 `;
 
 const RefreshButton = styled.Pressable`
-  padding: ${theme.spacing(2)}px ${theme.spacing(3)}px;
   border-width: 1px;
   border-color: #e5e7eb;
   border-radius: ${theme.radii.md}px;
@@ -35,8 +31,6 @@ const Item = styled.View`
   border-width: 1px;
   border-color: #e5e7eb;
   border-radius: ${theme.radii.md}px;
-  padding: ${theme.spacing(3)}px;
-  margin-bottom: ${theme.spacing(3)}px;
 `;
 
 const Line = styled.Text`
@@ -46,13 +40,13 @@ const Line = styled.Text`
 export const BookingList: React.FC = () => {
   const { loading, error, data, refetch } = useMyBookings({ fetchPolicy: "no-cache" });
 
-  if (loading) return <Wrap><Line>Loading…</Line></Wrap>;
-  if (error)   return <Wrap><Line style={{ color: "crimson" }}>Error: {error.message}</Line></Wrap>;
+  if (loading) return <Line>Loading…</Line>;
+  if (error)   return <Line style={{ color: "crimson" }}>Error: {error.message}</Line>;
 
   const bookings = data?.myBookings ?? [];
 
   return (
-    <Wrap>
+    <View>
       <HeaderRow>
         <Title>My Bookings</Title>
         <RefreshButton onPress={() => refetch()}>
@@ -75,7 +69,7 @@ export const BookingList: React.FC = () => {
           )}
         />
       )}
-    </Wrap>
+    </View>
   );
 };
 

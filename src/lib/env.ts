@@ -7,6 +7,6 @@ export const getGraphqlUrl = () => {
   const fallback =
     Platform.OS === "web"
       ? "http://localhost:8000/graphql/"
-      : "http://10.0.2.2:8000/graphql/";
+      : "192.168.1.10/graphql/";
   return fromEnv ?? fromExtra ?? fallback;
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { ApolloProvider } from "@apollo/client";
 import { ThemeProvider } from "styled-components/native";
-import { apolloClient } from "../lib/apollo/Client";
+import { apolloClient } from "../lib/apollo/client";
 import { theme } from "../shared/styles/theme";
 
 export const AppProviders: React.FC<React.PropsWithChildren> = ({ children }) => {

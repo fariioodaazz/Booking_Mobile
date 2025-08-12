@@ -2,7 +2,7 @@ import React from "react";
 import { ApolloProvider } from "@apollo/client";
 import { ThemeProvider } from "styled-components/native";
 import { apolloClient } from "../lib/apollo/client";
-import { theme } from "../shared/styles/theme";
+import { theme } from "../components/styles/theme";
 
 export const AppProviders =  ({ children }: React.PropsWithChildren)  => {
   // quick sanity check while debugging:

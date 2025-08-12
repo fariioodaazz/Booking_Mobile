@@ -1,17 +1,31 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@lib/*": ["src/lib/*"],
-      "@shared/*": ["src/shared/*"],
-      "@features/*": ["src/features/*"]
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@lib/*": [
+        "src/lib/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@features/*": [
+        "src/features/*"
+      ]
     },
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "src/shared/types/styled.d.ts"],
-  "exclude": ["src/main.tsx", "src/web"]
+  "include": [
+    "src",
+    "src/components/types/styled.d.ts"
+  ],
+  "exclude": [
+    "src/main.tsx",
+    "src/web"
+  ],
+  "extends": "expo/tsconfig.base"
 }

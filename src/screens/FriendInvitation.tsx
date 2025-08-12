@@ -3,18 +3,27 @@ import { useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 import { useQuery,useMutation } from '@apollo/client';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Avatar } from './ui/avatar';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { SimpleQuickListManager } from './ui/SimpleQuickListManager';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Avatar } from '../components/ui/avatar';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { SimpleQuickListManager } from '../components/ui/SimpleQuickListManager';
 import { UserPlus, User, Zap, ArrowLeft, ArrowRight, Users, X } from 'lucide-react-native';
 import { GET_MY_QUICK_LISTS } from '../api/quicklist/queries';
 import { DELETE_QUICK_LIST } from '../api/quicklist/mutations';
 import type { QuickList as ApiQuickList } from '../api/quicklist/types';
 import { gql } from '@apollo/client';
+import { ProgressIndicator } from '../components/ui/ProgressBar';
 
+type Route = "home" | "regulations" | "friendInvitation";
+
+const steps = [
+  { number: 1, completed: true },
+  { number: 2, completed: true },
+  { number: 3, active: true },
+  { number: 4 },
+];
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -313,27 +322,7 @@ export function FriendInvitation({
       <MaxWidthContainer>
         {/* Header */}
         <HeaderContainer>
-          <ProgressContainer>
-            <ProgressStep completed>
-              <ProgressStepText completed>✓</ProgressStepText>
-            </ProgressStep>
-            <ProgressLine active />
-            <ProgressStep completed>
-              <ProgressStepText completed>✓</ProgressStepText>
-            </ProgressStep>
-            <ProgressLine active />
-            <ProgressStep completed>
-              <ProgressStepText completed>✓</ProgressStepText>
-            </ProgressStep>
-            <ProgressLine active />
-            <ProgressStep active>
-              <ProgressStepText active>3</ProgressStepText>
-            </ProgressStep>
-            <ProgressLine />
-            <ProgressStep>
-              <ProgressStepText>4</ProgressStepText>
-            </ProgressStep>
-          </ProgressContainer>
+          <ProgressIndicator steps={steps} />
           <Title>Invite Friends</Title>
           <Subtitle>Add friends to join your game</Subtitle>
         </HeaderContainer>
@@ -513,6 +502,7 @@ export function FriendInvitation({
 // Demo component with real GraphQL data
 export function FriendInvitationDemo() {
   const [invitedFriends, setInvitedFriends] = useState<Friend[]>([]);
+  const [route, setRoute] = useState<Route>("home");
   
   const { data: quickListData, loading: quickListsLoading, error: quickListsError } = useQuery(GET_MY_QUICK_LISTS);
   
@@ -622,7 +612,8 @@ export function FriendInvitationDemo() {
   };
 
   const handleBack = () => {
-    console.log('Back pressed');
+    setRoute("home");
+
   };
 
   const handleNext = () => {

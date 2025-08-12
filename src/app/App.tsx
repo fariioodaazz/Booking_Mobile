@@ -4,16 +4,17 @@ import { AppProviders } from "src/app/providers";
 import { apolloClient } from "src/lib/apollo/client";
 import Login from "src/screens/Login";
 import Home from "src/screens/Home";
-import { RegulationsScreen } from "src/features/regulations/components/RegulationsScreen";
-import { FriendInvitationDemo } from "src/components/FriendInvitation";
+import { Regulations } from "src/screens/Regulations";
+import { FriendInvitationDemo } from "src/screens/FriendInvitation";
 import { ThemeProvider } from "styled-components/native";
-import { theme } from "src/shared/styles/theme";
+import { theme } from "src/components/styles/theme";
 
 
 
 type Route = "home" | "regulations" | "friendInvitation";
 
-const DEFAULT_FACILITY_ID = "3";
+
+const DEFAULT_CATEGORY_ID = "1";
 
 export default function App() {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
@@ -79,18 +80,23 @@ export default function App() {
         {hasToken ? (
           route === "home" ? (
             <Home
-              onBookCourt={() => setRoute("friendInvitation")}
+              onBookCourt={() => setRoute("regulations")}
               onLogout={handleLogout}
             />
           ) : route === "friendInvitation" ? (
             <FriendInvitationDemo />
-          ) : (
-            <RegulationsScreen
-              categoryId={DEFAULT_FACILITY_ID}
-              onShowReservations={() => { /* navigate to reservations flow */ }}
+          ) : route === "regulations" ? (
+            <Regulations
+              categoryId={DEFAULT_CATEGORY_ID}
+              headerTitle="NU Sports Booking"
+              headerSubtitle="Nile University Sports Facilities"
+              policiesTitle="Sports Facilities Policies"
+              onShowReservations={() => { setRoute("friendInvitation") }}
               onReserve={() => setRoute("home")}
               onBackHome={() => setRoute("home")}
             />
+          ) : (
+            <></>
           )
         ) : (
           <Login onLoggedIn={() => setHasToken(true)} />

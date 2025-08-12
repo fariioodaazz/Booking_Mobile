@@ -432,7 +432,7 @@ export const Regulations: React.FC<Props> = ({
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               {isEligible ? (
                 <>
-                  
+                  <CalendarIconButton color="#ffffff" />
                   <Text style={{ 
                     color: '#ffffff', 
                     fontSize: 16, 

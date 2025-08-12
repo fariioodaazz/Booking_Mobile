@@ -1,25 +1,31 @@
 // src/screens/Home.tsx
 import React from "react";
-import { Button } from "../shared/components/Button/Button";
-import { SafeAreaView } from "react-native";
-
+import { Button } from "../components/ui/button";
+import { SafeAreaView, Text } from "react-native";
 import styled from "styled-components/native";
-import {theme} from "../shared/styles/theme";
-import { ThemeProvider } from 'styled-components/native';
 
+const Container = styled(SafeAreaView)`
+  flex: 1;
+  justify-content: center;
+  padding: 20px;
+  gap: 16px;
+`;
 
 type Props = {
   onBookCourt: () => void;
   onLogout: () => void;
 };
 
-
 export const Home: React.FC<Props> = ({ onBookCourt, onLogout }) => {
   return (
-    <ThemeProvider theme={theme}>
-          <Button title="Book a court" onPress={onBookCourt} variant="primary" size="lg" fullWidth />
-          <Button title="Logout" onPress={onLogout} variant="outline" size="md" fullWidth />
-    </ThemeProvider>
+    <Container>
+      <Button onPress={onBookCourt} variant="default" size="lg">
+        Book a court
+      </Button>
+      <Button onPress={onLogout} variant="outline" size="default">
+        Logout
+      </Button>
+    </Container>
   );
 };
 

@@ -8,7 +8,7 @@ import {
   StyleSheet 
 } from "react-native";
 import { useQuery } from "@apollo/client";
-import { Button } from "../../../shared/components/Button/Button";
+import { Button } from "../../../components/ui/button";
 import { REGULATIONS_PAGE_QUERY } from "../graphql/queries.gql";
 
 type Props = {
@@ -42,16 +42,18 @@ export const RegulationsScreen: React.FC<Props> = ({
       <View style={styles.wrap}>
         <Text style={styles.errorText}>Error: {error.message}</Text>
         <Button 
-          title="Try again" 
           variant="outline" 
           onPress={() => refetch()} 
-          fullWidth 
-        />
+          style={{ width: '100%', marginBottom: 12 }}
+        >
+          Try again
+        </Button>
         <Button 
-          title="Back" 
           onPress={onBackHome} 
           variant="ghost" 
-        />
+        >
+          Back
+        </Button>
       </View>
     );
   }
@@ -117,25 +119,29 @@ export const RegulationsScreen: React.FC<Props> = ({
 
       <View style={styles.actions}>
         <Button 
-          title="Reserve a Court" 
           onPress={handleReserve} 
-          variant="primary" 
+          variant="default" 
           size="lg" 
-          fullWidth 
-        />
+          style={{ width: '100%' }}
+          disabled={disabled}
+        >
+          Reserve a Court
+        </Button>
         <View style={styles.space} />
         <Button 
-          title="Show My Reservations" 
           onPress={onShowReservations} 
           variant="outline" 
-          fullWidth 
-        />
+          style={{ width: '100%' }}
+        >
+          Show My Reservations
+        </Button>
         <View style={styles.space} />
         <Button 
-          title="Back" 
           onPress={onBackHome} 
           variant="ghost" 
-        />
+        >
+          Back
+        </Button>
       </View>
     </ScrollView>
   );

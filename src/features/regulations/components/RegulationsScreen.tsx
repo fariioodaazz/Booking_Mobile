@@ -1,3 +1,4 @@
+// RegulationsScreen.tsx
 import React from "react";
 import { 
   ActivityIndicator, 
@@ -16,6 +17,11 @@ type Props = {
   onShowReservations: () => void;
   onReserve: () => void;
   onBackHome?: () => void;
+
+  /** Reusability props */
+  headerTitle?: string;       // replaces "NU Sports Booking"
+  headerSubtitle?: string;    // replaces "Nile University Sports Facilities"
+  policiesTitle?: string;     // replaces "Sports Facilities Policies"
 };
 
 export const RegulationsScreen: React.FC<Props> = ({
@@ -23,6 +29,9 @@ export const RegulationsScreen: React.FC<Props> = ({
   onShowReservations,
   onReserve,
   onBackHome,
+  headerTitle = "Booking",
+  headerSubtitle = "Policies & Regulations",
+  policiesTitle = "Policies",
 }) => {
   const { data, loading, error, refetch } = useQuery(REGULATIONS_PAGE_QUERY, {
     variables: { categoryId },
@@ -49,8 +58,8 @@ export const RegulationsScreen: React.FC<Props> = ({
 
   const category = data?.category;
   const sections = category?.regulations ?? [];
-  const elig = data?.myGeneralEligibility;
-  const disabled = !elig?.eligible;
+  const elig = data?.myGeneralEligibility; // <-- new query result
+  const disabled = elig ? !elig.eligible : true;
 
   const handleReserve = () => {
     if (disabled) {
@@ -64,8 +73,8 @@ export const RegulationsScreen: React.FC<Props> = ({
   return (
     <ScrollView contentContainerStyle={{ padding: 16 }}>
       <View style={styles.headerCard}>
-        <Text style={styles.appTitle}>NU Sports Booking</Text>
-        <Text style={styles.subtitle}>Nile University Sports Facilities</Text>
+        <Text style={styles.appTitle}>{headerTitle}</Text>
+        {headerSubtitle ? <Text style={styles.subtitle}>{headerSubtitle}</Text> : null}
         {category?.name && (
           <View style={styles.chipsRow}>
             <Text style={styles.chip}>{category.name}</Text>
@@ -74,7 +83,7 @@ export const RegulationsScreen: React.FC<Props> = ({
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Sports Facilities Policies</Text>
+        <Text style={styles.cardTitle}>{policiesTitle}</Text>
         {sections.length === 0 ? (
           <Text style={styles.muted}>No regulations available.</Text>
         ) : (
@@ -90,17 +99,17 @@ export const RegulationsScreen: React.FC<Props> = ({
         )}
       </View>
 
-      {!elig?.eligible && (
+      {elig && !elig.eligible && (
         <View style={styles.banner}>
           <Text style={styles.bannerTitle}>Heads up</Text>
-          {(elig?.reasons || []).map((r: string, i: number) => (
+          {(elig.reasons || []).map((r: string, i: number) => (
             <Text key={i} style={styles.bannerLine}>• {reasonToHuman(r)}</Text>
           ))}
         </View>
       )}
 
       <View style={styles.actions}>
-        <Button title="Reserve a Court" onPress={handleReserve} variant="primary" size="lg" fullWidth />
+        <Button title="Reserve" onPress={handleReserve} variant="primary" size="lg" fullWidth />
         <View style={styles.space} />
         <Button title="Show My Reservations" onPress={onShowReservations} variant="outline" fullWidth />
         <View style={styles.space} />
@@ -116,121 +125,41 @@ const reasonToHuman = (code: string) => {
     case "AUTH_REQUIRED": return "Please log in to continue.";
     case "SUSPENDED": return "Your account is currently suspended.";
     case "QUOTA_EXHAUSTED": return "You've used all your booking quota.";
-    default: return code.replace(/_/g, " ");
+    default: return (code || "").replace(/_/g, " ");
   }
 };
 
 const styles = StyleSheet.create({
-  wrap: {
-    padding: 16,
-  },
-  loadingWrap: {
-    flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  wrap: { padding: 16 },
+  loadingWrap: { flex: 1, padding: 16, alignItems: 'center', justifyContent: 'center' },
   headerCard: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 20,
-    backgroundColor: '#fff',
-    marginBottom: 16,
+    borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8,
+    padding: 20, backgroundColor: '#fff', marginBottom: 16,
   },
-  appTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#6b7280',
-    marginTop: 4,
-  },
-  chipsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
+  appTitle: { fontSize: 22, fontWeight: '800', textAlign: 'center' },
+  subtitle: { textAlign: 'center', color: '#6b7280', marginTop: 4 },
+  chipsRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
   chip: {
-    overflow: 'hidden',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    fontWeight: '600',
-    marginRight: 8,
-  },
-  chipOk: {
-    color: '#065f46',
-    backgroundColor: '#ecfdf5',
-    borderWidth: 1,
-    borderColor: '#a7f3d0',
-  },
-  chipWarn: {
-    color: '#92400e',
-    backgroundColor: '#fef3c7',
-    borderWidth: 1,
-    borderColor: '#fde68a',
+    overflow: 'hidden', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999,
+    fontWeight: '600', marginRight: 8, borderWidth: 1, borderColor: '#e5e7eb',
   },
   card: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 20,
-    backgroundColor: '#fff',
+    borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8,
+    padding: 20, backgroundColor: '#fff',
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  section: {
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  bullet: {
-    color: '#111827',
-    marginLeft: 4,
-    marginBottom: 4,
-    lineHeight: 22,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#f3f4f6',
-    marginVertical: 8,
-  },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  section: { marginBottom: 12 },
+  sectionTitle: { fontWeight: '700', marginBottom: 4 },
+  bullet: { color: '#111827', marginLeft: 4, marginBottom: 4, lineHeight: 22 },
+  divider: { height: 1, backgroundColor: '#f3f4f6', marginVertical: 8 },
   banner: {
-    borderWidth: 1,
-    borderColor: '#fde68a',
-    backgroundColor: '#fffbeb',
-    padding: 16,
-    borderRadius: 8,
-    marginVertical: 16,
+    borderWidth: 1, borderColor: '#fde68a', backgroundColor: '#fffbeb',
+    padding: 16, borderRadius: 8, marginVertical: 16,
   },
-  bannerTitle: {
-    fontWeight: '800',
-    color: '#92400e',
-    marginBottom: 8,
-  },
-  bannerLine: {
-    color: '#92400e',
-    marginBottom: 4,
-  },
-  actions: {
-    marginTop: 16,
-  },
-  space: {
-    height: 12,
-  },
-  errorText: {
-    color: 'crimson',
-    marginBottom: 8,
-  },
-  muted: {
-    color: '#6b7280',
-  },
+  bannerTitle: { fontWeight: '800', color: '#92400e', marginBottom: 8 },
+  bannerLine: { color: '#92400e', marginBottom: 4 },
+  actions: { marginTop: 16 },
+  space: { height: 12 },
+  errorText: { color: 'crimson', marginBottom: 8 },
+  muted: { color: '#6b7280' },
 });

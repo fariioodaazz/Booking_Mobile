@@ -45,6 +45,9 @@ export default function App() {
         ) : (
           <RegulationsScreen
             categoryId={DEFAULT_CATEGORY_ID}
+            headerTitle="NU Sports Booking"
+            headerSubtitle="Nile University Sports Facilities"
+            policiesTitle="Sports Facilities Policies"
             onShowReservations={() => {/* navigate to your reservations flow if you want */}}
             onReserve={() => setRoute("home")}
             onBackHome={() => setRoute("home")}

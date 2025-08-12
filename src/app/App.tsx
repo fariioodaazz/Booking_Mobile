@@ -11,7 +11,7 @@ import { theme } from "src/shared/styles/theme";
 
 type Route = "home" | "regulations";
 
-const DEFAULT_FACILITY_ID = "3"; 
+const DEFAULT_CATEGORY_ID = "1";
 
 export default function App() {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
@@ -44,7 +44,7 @@ export default function App() {
           />
         ) : (
           <RegulationsScreen
-            facilityId={DEFAULT_FACILITY_ID}
+            categoryId={DEFAULT_CATEGORY_ID}
             onShowReservations={() => {/* navigate to your reservations flow if you want */}}
             onReserve={() => setRoute("home")}
             onBackHome={() => setRoute("home")}

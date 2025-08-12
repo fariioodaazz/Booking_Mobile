@@ -12,20 +12,20 @@ import { Button } from "../../../shared/components/Button/Button";
 import { REGULATIONS_PAGE_QUERY } from "../graphql/queries.gql";
 
 type Props = {
-  facilityId: string;
+  categoryId: string;
   onShowReservations: () => void;
   onReserve: () => void;
   onBackHome?: () => void;
 };
 
 export const RegulationsScreen: React.FC<Props> = ({
-  facilityId,
+  categoryId,
   onShowReservations,
   onReserve,
   onBackHome,
 }) => {
   const { data, loading, error, refetch } = useQuery(REGULATIONS_PAGE_QUERY, {
-    variables: { facilityId },
+    variables: { categoryId },
     fetchPolicy: "no-cache",
   });
 
@@ -41,24 +41,15 @@ export const RegulationsScreen: React.FC<Props> = ({
     return (
       <View style={styles.wrap}>
         <Text style={styles.errorText}>Error: {error.message}</Text>
-        <Button 
-          title="Try again" 
-          variant="outline" 
-          onPress={() => refetch()} 
-          fullWidth 
-        />
-        <Button 
-          title="Back" 
-          onPress={onBackHome} 
-          variant="ghost" 
-        />
+        <Button title="Try again" variant="outline" onPress={() => refetch()} fullWidth />
+        <Button title="Back" onPress={onBackHome} variant="ghost" />
       </View>
     );
   }
 
-  const facility = data?.facility;
-  const sections = facility?.regulations?.sections ?? [];
-  const elig = data?.myBookingEligibility;
+  const category = data?.category;
+  const sections = category?.regulations ?? [];
+  const elig = data?.myGeneralEligibility;
   const disabled = !elig?.eligible;
 
   const handleReserve = () => {
@@ -75,18 +66,11 @@ export const RegulationsScreen: React.FC<Props> = ({
       <View style={styles.headerCard}>
         <Text style={styles.appTitle}>NU Sports Booking</Text>
         <Text style={styles.subtitle}>Nile University Sports Facilities</Text>
-
-        <View style={styles.chipsRow}>
-          {facility?.category?.name && (
-            <Text style={styles.chip}>{facility.category.name}</Text>
-          )}
-          <Text style={[
-            styles.chip,
-            facility?.is_available ? styles.chipOk : styles.chipWarn
-          ]}>
-            {facility?.is_available ? "Available" : "Unavailable"}
-          </Text>
-        </View>
+        {category?.name && (
+          <View style={styles.chipsRow}>
+            <Text style={styles.chip}>{category.name}</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.card}>
@@ -116,26 +100,11 @@ export const RegulationsScreen: React.FC<Props> = ({
       )}
 
       <View style={styles.actions}>
-        <Button 
-          title="Reserve a Court" 
-          onPress={handleReserve} 
-          variant="primary" 
-          size="lg" 
-          fullWidth 
-        />
+        <Button title="Reserve a Court" onPress={handleReserve} variant="primary" size="lg" fullWidth />
         <View style={styles.space} />
-        <Button 
-          title="Show My Reservations" 
-          onPress={onShowReservations} 
-          variant="outline" 
-          fullWidth 
-        />
+        <Button title="Show My Reservations" onPress={onShowReservations} variant="outline" fullWidth />
         <View style={styles.space} />
-        <Button 
-          title="Back" 
-          onPress={onBackHome} 
-          variant="ghost" 
-        />
+        <Button title="Back" onPress={onBackHome} variant="ghost" />
       </View>
     </ScrollView>
   );

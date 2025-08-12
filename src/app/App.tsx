@@ -86,7 +86,7 @@ export default function App() {
             <FriendInvitationDemo />
           ) : (
             <RegulationsScreen
-              facilityId={DEFAULT_FACILITY_ID}
+              categoryId={DEFAULT_FACILITY_ID}
               onShowReservations={() => { /* navigate to reservations flow */ }}
               onReserve={() => setRoute("home")}
               onBackHome={() => setRoute("home")}

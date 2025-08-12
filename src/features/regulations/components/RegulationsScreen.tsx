@@ -9,7 +9,7 @@ import {
   StyleSheet 
 } from "react-native";
 import { useQuery } from "@apollo/client";
-import { Button } from "../../../shared/components/Button/Button";
+import { Button } from "../../../components/ui/button";
 import { REGULATIONS_PAGE_QUERY } from "../graphql/queries.gql";
 
 type Props = {
@@ -50,8 +50,19 @@ export const RegulationsScreen: React.FC<Props> = ({
     return (
       <View style={styles.wrap}>
         <Text style={styles.errorText}>Error: {error.message}</Text>
-        <Button title="Try again" variant="outline" onPress={() => refetch()} fullWidth />
-        <Button title="Back" onPress={onBackHome} variant="ghost" />
+        <Button 
+          variant="outline" 
+          onPress={() => refetch()} 
+          style={{ width: '100%', marginBottom: 12 }}
+        >
+          Try again
+        </Button>
+        <Button 
+          onPress={onBackHome} 
+          variant="ghost" 
+        >
+          Back
+        </Button>
       </View>
     );
   }
@@ -109,11 +120,30 @@ export const RegulationsScreen: React.FC<Props> = ({
       )}
 
       <View style={styles.actions}>
-        <Button title="Reserve" onPress={handleReserve} variant="primary" size="lg" fullWidth />
+        <Button 
+          onPress={handleReserve} 
+          variant="default" 
+          size="lg" 
+          style={{ width: '100%' }}
+          disabled={disabled}
+        >
+          Reserve a Court
+        </Button>
         <View style={styles.space} />
-        <Button title="Show My Reservations" onPress={onShowReservations} variant="outline" fullWidth />
+        <Button 
+          onPress={onShowReservations} 
+          variant="outline" 
+          style={{ width: '100%' }}
+        >
+          Show My Reservations
+        </Button>
         <View style={styles.space} />
-        <Button title="Back" onPress={onBackHome} variant="ghost" />
+        <Button 
+          onPress={onBackHome} 
+          variant="ghost" 
+        >
+          Back
+        </Button>
       </View>
     </ScrollView>
   );

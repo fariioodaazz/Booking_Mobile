@@ -9,10 +9,10 @@ import { FriendInvitationDemo } from "src/screens/FriendInvitation";
 import { WelcomePage } from "src/screens/WelcomePage"; // Import your new welcome page
 import { ThemeProvider } from "styled-components/native";
 import { theme } from "src/components/styles/theme";
+import { BookingsList } from "src/screens/BookingsList";
 
-type Route = "home" | "regulations" | "friendInvitation";
+type Route = "home" | "regulations" | "friendInvitation" | "bookings";
 
-const DEFAULT_CATEGORY_ID = "1";
 
 export default function App() {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
@@ -101,14 +101,16 @@ export default function App() {
             <FriendInvitationDemo />
           ) : route === "regulations" ? (
             <Regulations
-              categoryId={DEFAULT_CATEGORY_ID}
+              categoryName="COURT"
               headerTitle="NU Sports Booking"
               headerSubtitle="Nile University Sports Facilities"
               policiesTitle="Sports Facilities Policies"
-              onShowReservations={() => { setRoute("friendInvitation") }}
-              onReserve={() => setRoute("home")}
+              onShowReservations={() => { setRoute("bookings") }}
+              onReserve={() => setRoute("friendInvitation")}
               onBackHome={() => setRoute("home")}
             />
+          ) : route === "bookings" ? (
+            <BookingsList onBackToRegulations={() => setRoute("regulations")} />
           ) : (
             <></>
           )

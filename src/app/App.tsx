@@ -106,7 +106,7 @@ export default function App() {
               headerSubtitle="Nile University Sports Facilities"
               policiesTitle="Sports Facilities Policies"
               onShowReservations={() => { setRoute("friendInvitation") }}
-              onReserve={() => setRoute("home")}
+              onReserve={() => setRoute("friendInvitation")}
               onBackHome={() => setRoute("home")}
             />
           ) : (

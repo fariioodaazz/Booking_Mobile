@@ -1,33 +1,22 @@
 // FriendsInvitation.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import { useQuery,useMutation } from '@apollo/client';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Avatar } from '../components/ui/avatar';
-import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { SimpleQuickListManager } from '../components/ui/SimpleQuickListManager';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Avatar } from './ui/avatar';
+import { Badge } from './ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { SimpleQuickListManager } from './ui/SimpleQuickListManager';
 import { UserPlus, User, Zap, ArrowLeft, ArrowRight, Users, X, Search } from 'lucide-react-native';
 import { GET_MY_QUICK_LISTS } from '../api/quicklist/queries';
-import { DELETE_QUICK_LIST } from '../api/quicklist/mutations';
-import { CREATE_QUICK_LIST } from '../api/quicklist/mutations';
-import { UPDATE_QUICK_LIST } from '../api/quicklist/mutations';
+import { CREATE_QUICK_LIST, DELETE_QUICK_LIST, UPDATE_QUICK_LIST } from '../api/quicklist/mutations';
 import { SEARCH_USER_BY_NU_ID } from '../api/quicklist/mutations';
 import type { QuickList as ApiQuickList } from '../api/quicklist/types';
 import { gql } from '@apollo/client';
-import { ProgressIndicator } from '../components/ui/ProgressBar';
 
-type Route = "home" | "regulations" | "friendInvitation";
-
-const steps = [
-  { number: 1, completed: true },
-  { number: 2, completed: true },
-  { number: 3, active: true },
-  { number: 4 },
-];
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -289,6 +278,7 @@ export function FriendInvitation({
   onNext
 }: FriendInvitationProps) {
   const [friendId, setFriendId] = useState('');
+  const [searchResult, setSearchResult] = useState<any>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -342,7 +332,27 @@ export function FriendInvitation({
       <MaxWidthContainer>
         {/* Header */}
         <HeaderContainer>
-          <ProgressIndicator steps={steps} />
+          <ProgressContainer>
+            <ProgressStep completed>
+              <ProgressStepText completed>✓</ProgressStepText>
+            </ProgressStep>
+            <ProgressLine active />
+            <ProgressStep completed>
+              <ProgressStepText completed>✓</ProgressStepText>
+            </ProgressStep>
+            <ProgressLine active />
+            <ProgressStep completed>
+              <ProgressStepText completed>✓</ProgressStepText>
+            </ProgressStep>
+            <ProgressLine active />
+            <ProgressStep active>
+              <ProgressStepText active>3</ProgressStepText>
+            </ProgressStep>
+            <ProgressLine />
+            <ProgressStep>
+              <ProgressStepText>4</ProgressStepText>
+            </ProgressStep>
+          </ProgressContainer>
           <Title>Invite Friends</Title>
           <Subtitle>Add friends to join your game</Subtitle>
         </HeaderContainer>
@@ -481,6 +491,9 @@ export function FriendInvitation({
                         </View>
                       ))}
                     </View>
+                  )}
+                  {searchResult && (
+                    <Text style={{ color: 'green', marginTop: 4 }}>{searchResult.message}</Text>
                   )}
                 </CardContainer>
 
@@ -621,13 +634,13 @@ export function FriendInvitation({
 // Demo component with real GraphQL data
 export function FriendInvitationDemo() {
   const [invitedFriends, setInvitedFriends] = useState<Friend[]>([]);
-  const [route, setRoute] = useState<Route>("home");
   
   const { data: quickListData, loading: quickListsLoading, error: quickListsError } = useQuery(GET_MY_QUICK_LISTS);
+  
+  // Use the proper mutations from mutations.ts
+  const [deleteQuickList, { loading: deleteLoading, error: deleteError }] = useMutation(DELETE_QUICK_LIST);
   const [createQuickList, { loading: createLoading, error: createError }] = useMutation(CREATE_QUICK_LIST);
   const [updateQuickList, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_QUICK_LIST);
-  // Use the proper mutation from mutations.ts
-  const [deleteQuickList, { loading: deleteLoading, error: deleteError }] = useMutation(DELETE_QUICK_LIST);
   
   const quickLists: QuickList[] = quickListData?.myQuickLists?.map((apiList: ApiQuickList) => ({
     id: apiList.id,
@@ -636,11 +649,10 @@ export function FriendInvitationDemo() {
       id: String(user.nuId), // Use nuId as string to match how we add friends
       username: user.name.toLowerCase().replace(/\s+/g, ''), 
       name: user.name, 
-      avatar: null, // Will use defaultImage fallback
+      avatar: '', 
     })) || []
   })) || [];
-  
-  // Show loading state
+
   if (quickListsLoading) {
     return (
       <Container>
@@ -684,6 +696,7 @@ export function FriendInvitationDemo() {
   };
 
   const handleCreateQuickList = (list: Omit<QuickList, 'id'>) => {
+    // Use GraphQL mutation to create quicklist
     createQuickList({
       variables: {
         name: list.name,
@@ -769,45 +782,64 @@ export function FriendInvitationDemo() {
   };
 
   const handleDeleteQuickList = async (listId: string) => {
-    console.log('🗑️ Attempting to delete quicklist with ID:', listId);
+    const listToDelete = quickLists.find(list => list.id === listId);
+    const listName = listToDelete?.name || 'this quicklist';
     
-    // Check authentication token
-    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-    const token = await AsyncStorage.getItem('token');
-    console.log('� Current auth token:', token ? 'Token exists' : 'No token found');
+    Alert.alert(
+      'Delete Quicklist',
+      `Are you sure you want to delete "${listName}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            console.log('🗑️ Attempting to delete quicklist with ID:', listId);
+            
+            // Check authentication token
+            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+            const token = await AsyncStorage.getItem('token');
+            console.log('🔑 Current auth token:', token ? 'Token exists' : 'No token found');
 
-    try {
-      const result = await deleteQuickList({
-        variables: { quicklistID: listId },
-        refetchQueries: [{ query: GET_MY_QUICK_LISTS }],
-      });
-      
-      console.log('✅ Delete mutation result:', result);
-      
-      if (result.data?.deleteQuickList?.success) {
-        console.log('QuickList deleted successfully:', result.data.deleteQuickList.message);
-      } else {
-        console.error('Failed to delete quicklist:', result.data?.deleteQuickList?.message);
-      }
-    } catch (error: any) {
-      console.error('❌ Error deleting quicklist:', error);
-      console.error('Error details:', {
-        message: error.message,
-        graphQLErrors: error.graphQLErrors,
-        networkError: error.networkError,
-        variables: { quicklistID: listId }
-      });
-      
-      // Additional debugging
-      if (error.networkError) {
-        console.error('Network error details:', error.networkError);
-      }
-    }
+            try {
+              const result = await deleteQuickList({
+                variables: { quicklistID: listId },
+                refetchQueries: [{ query: GET_MY_QUICK_LISTS }],
+              });
+              
+              console.log('✅ Delete mutation result:', result);
+              
+              if (result.data?.deleteQuickList?.success) {
+                console.log('QuickList deleted successfully:', result.data.deleteQuickList.message);
+              } else {
+                console.error('Failed to delete quicklist:', result.data?.deleteQuickList?.message);
+              }
+            } catch (error: any) {
+              console.error('❌ Error deleting quicklist:', error);
+              console.error('Error details:', {
+                message: error.message,
+                graphQLErrors: error.graphQLErrors,
+                networkError: error.networkError,
+                variables: { quicklistID: listId }
+              });
+              
+              // Additional debugging
+              if (error.networkError) {
+                console.error('Network error details:', error.networkError);
+              }
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleBack = () => {
-    setRoute("home");
-
+    console.log('Back pressed');
   };
 
   const handleNext = () => {

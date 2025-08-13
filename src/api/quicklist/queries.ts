@@ -9,6 +9,7 @@ export const GET_MY_QUICK_LISTS = gql`
       users {
         id
         name
+        nuId
       }
     }
   }

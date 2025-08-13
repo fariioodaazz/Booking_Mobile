@@ -1,4 +1,3 @@
-// RegulationsScreen.tsx
 import React, { useState } from "react";
 import { 
   ActivityIndicator, 
@@ -22,7 +21,7 @@ import MoveLeftIcon from '../../assets/MoveLeftIcon';
 
 
 type Props = {
-  categoryId: string;
+  categoryName: string;
   onShowReservations: () => void;
   onReserve: () => void;
   onBackHome?: () => void;
@@ -42,9 +41,10 @@ const Container = styled.View`
 `;
 
 const MaxWidthContainer = styled.View`
-  max-width: 384px;
+    max-width: 384px;
   margin: 0 auto;
   width: 100%;
+  flex: 1; /* important so the list gets height */
 `;
 
 const HeaderContainer = styled.View`
@@ -308,7 +308,7 @@ const CollapsibleSection: React.FC<SectionProps> = ({
 };
 
 export const Regulations: React.FC<Props> = ({
-  categoryId,
+  categoryName,
   onShowReservations,
   onReserve,
   onBackHome,
@@ -317,7 +317,7 @@ export const Regulations: React.FC<Props> = ({
   policiesTitle,
 }) => {
   const { data, loading, error, refetch } = useQuery(REGULATIONS_PAGE_QUERY, {
-    variables: { categoryId },
+    variables: { category: categoryName },
     fetchPolicy: "no-cache",
   });
 

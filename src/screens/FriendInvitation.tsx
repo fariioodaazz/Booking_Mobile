@@ -42,41 +42,6 @@ const HeaderContainer = styled.View`
   padding-top: 15px;
 `;
 
-const ProgressContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 12px;
-  margin-top: 20px;
-`;
-
-const ProgressStep = styled.View<{ active?: boolean; completed?: boolean }>`
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
-  align-items: center;
-  justify-content: center;
-  background-color: ${(props: { active?: boolean; completed?: boolean }) => {
-    if (props.active) return '#007AFF';
-    if (props.completed) return '#007AFF';
-    return '#e5e7eb';
-  }};
-`;
-
-const ProgressStepText = styled.Text<{ active?: boolean; completed?: boolean }>`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${(props: { active?: boolean; completed?: boolean }) => {
-    if (props.active || props.completed) return '#ffffff';
-    return '#9ca3af';
-  }};
-`;
-
-const ProgressLine = styled.View<{ active?: boolean }>`
-  flex: 1;
-  height: 2px;
-  background-color: ${(props: { active?: boolean }) => props.active ? '#007AFF' : '#007AFF40'};
-`;
-
 const Title = styled.Text`
   color: #007AFF;
   font-size: 24px;

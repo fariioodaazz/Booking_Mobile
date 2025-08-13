@@ -1,6 +1,6 @@
 // app/screens/BookingsList.tsx
 import React, { useMemo } from "react";
-import { ActivityIndicator, View, Text, FlatList, Alert } from "react-native";
+import { ActivityIndicator, View, Text, FlatList, Alert, Dimensions, StatusBar } from "react-native";
 import styled from "styled-components/native";
 import { useMutation, useQuery } from "@apollo/client";
 import { Button } from "../components/ui/button";
@@ -15,6 +15,39 @@ import CheckIcon from "../../assets/CheckIcon";
 
 import { MY_BOOKINGS_QUERY } from "../api/user/queries";
 import { CANCEL_BOOKING_MUTATION } from "../api/booking/mutations";
+import { Booking } from "../api/booking/types";
+
+const { width, height } = Dimensions.get('window');
+
+// Responsive helper
+const getResponsiveDimensions = () => {
+  const isSmallScreen = height < 700;
+  const isTablet = width > 768;
+  const isVerySmallScreen = height < 600;
+  
+  return {
+    isSmallScreen,
+    isTablet,
+    isVerySmallScreen,
+    sidePadding: isSmallScreen ? 16 : 20,
+    maxWidth: isTablet ? 500 : 400,
+    containerPaddingTop: (StatusBar.currentHeight || 0) + (isVerySmallScreen ? 8 : 10),
+    containerPaddingBottom: isVerySmallScreen ? 20 : 32,
+    headerPaddingTop: isVerySmallScreen ? 10 : 20,
+    headerMarginBottom: isVerySmallScreen ? 12 : 16,
+    iconSize: isSmallScreen ? 48 : 56,
+    titleSize: isSmallScreen ? 22 : 24,
+    subtitleSize: isSmallScreen ? 14 : 16,
+    cardPadding: isSmallScreen ? 10 : 12,
+    cardMarginBottom: isSmallScreen ? 10 : 12,
+    titleTextSize: isSmallScreen ? 14 : 16,
+    subTextSize: isSmallScreen ? 11 : 12,
+    badgeTextSize: isSmallScreen ? 11 : 12,
+    buttonPadding: isVerySmallScreen ? 12 : isSmallScreen ? 14 : 16,
+    buttonTextSize: isSmallScreen ? 14 : 16,
+    bottomPadding: isVerySmallScreen ? 16 : 20,
+  };
+};
 
 // ───────────────────────────────────────── Types ─────────────────────────────────────────
 type Tone = "default" | "green" | "yellow" | "red" | "blue";
@@ -27,46 +60,34 @@ type Props = {
   onBackToRegulations: () => void;
 };
 
-type Booking = {
-  id: string;
-  status: string;                     // API returns UPPERCASE: PENDING/CANCELLED/CONFIRMED
-  bookingDate: string;
-  pendingTimestamp?: string | null;
-  isCancellable?: boolean | null;
-  facility: { id: string; info: string };
-  slot: { id: string; theHour: number };
-  participants?: Array<{
-    id: string;
-    isConfirmed: boolean;
-    user: { id: string; name: string };
-  }>;
-};
+
 
 // ───────────────────────────────────── Styled Components ──────────────────────────────────────
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  padding-top: 30px;
-  padding-bottom: 32px;
+  padding-top: ${() => getResponsiveDimensions().containerPaddingTop}px;
+  padding-bottom: ${() => getResponsiveDimensions().containerPaddingBottom}px;
 `;
 
 const MaxWidthContainer = styled.View`
-  max-width: 384px;
+  max-width: ${() => getResponsiveDimensions().maxWidth}px;
   margin: 0 auto;
   width: 100%;
-  flex: 1; /* important so the list gets height */
+  flex: 1;
+  padding-horizontal: ${() => getResponsiveDimensions().sidePadding}px;
 `;
 
 const HeaderContainer = styled.View`
   align-items: center;
-  margin-bottom: 16px;
-  padding-top: 20px;
+  margin-bottom: ${() => getResponsiveDimensions().headerMarginBottom}px;
+  padding-top: ${() => getResponsiveDimensions().headerPaddingTop}px;
 `;
 
 const IconContainer = styled.View`
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
+  width: ${() => getResponsiveDimensions().iconSize}px;
+  height: ${() => getResponsiveDimensions().iconSize}px;
+  border-radius: ${() => getResponsiveDimensions().iconSize / 2}px;
   background-color: #007aff;
   align-items: center;
   justify-content: center;
@@ -75,15 +96,17 @@ const IconContainer = styled.View`
 
 const Title = styled.Text`
   color: #007aff;
-  font-size: 24px;
+  font-size: ${() => getResponsiveDimensions().titleSize}px;
   font-weight: 600;
   margin-bottom: 4px;
+  text-align: center;
 `;
 
 const Subtitle = styled.Text`
   color: #6b7280;
-  font-size: 16px;
+  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
   text-align: center;
+  padding-horizontal: 10px;
 `;
 
 const Row = styled.View`
@@ -99,13 +122,14 @@ const SpaceBetween = styled.View`
 `;
 
 const TitleText = styled.Text`
-  font-size: 16px;
+  font-size: ${() => getResponsiveDimensions().titleTextSize}px;
   color: #111827;
   font-weight: 600;
+  flex: 1;
 `;
 
 const SubText = styled.Text`
-  font-size: 12px;
+  font-size: ${() => getResponsiveDimensions().subTextSize}px;
   color: #6b7280;
 `;
 
@@ -120,7 +144,7 @@ const Dot = styled.View`
 const Line = styled.View`
   height: 1px;
   background-color: #e5e7eb;
-  margin: 10px 0;
+  margin: ${() => getResponsiveDimensions().isVerySmallScreen ? '8px' : '10px'} 0;
 `;
 
 // Card
@@ -129,8 +153,8 @@ const Card = styled.View<CardProps>`
   border-radius: 12px;
   border-width: 1px;
   border-color: #e5e7eb;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: ${() => getResponsiveDimensions().cardPadding}px;
+  margin-bottom: ${() => getResponsiveDimensions().cardMarginBottom}px;
 
   ${(props: CardProps) => {
     const t = props.$tone;
@@ -148,7 +172,7 @@ const Card = styled.View<CardProps>`
 
 // Badge
 const Badge = styled.View<BadgeProps>`
-  padding: 4px 8px;
+  padding: ${() => getResponsiveDimensions().isVerySmallScreen ? '3px 6px' : '4px 8px'};
   border-radius: 999px;
   flex-direction: row;
   align-items: center;
@@ -169,7 +193,7 @@ const Badge = styled.View<BadgeProps>`
 
 // BadgeText
 const BadgeText = styled.Text<BadgeProps>`
-  font-size: 12px;
+  font-size: ${() => getResponsiveDimensions().badgeTextSize}px;
 
   ${(props: BadgeProps) => {
     const v = props.$variant;
@@ -186,7 +210,42 @@ const BadgeText = styled.Text<BadgeProps>`
 `;
 
 const FixedButtonsWrapper = styled.View`
-  padding: 16px 20px 20px 20px;
+  padding: ${() => getResponsiveDimensions().bottomPadding}px;
+`;
+
+const EmptyContainer = styled.View`
+  align-items: center;
+  padding-vertical: ${() => getResponsiveDimensions().isVerySmallScreen ? '30px' : '40px'};
+  flex: 1;
+  justify-content: center;
+`;
+
+const EmptyText = styled.Text`
+  color: #6b7280;
+  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
+  text-align: center;
+  padding-horizontal: 20px;
+`;
+
+const ErrorContainer = styled.View`
+  padding: 16px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+`;
+
+const ErrorText = styled.Text`
+  color: #dc2626;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
+`;
+
+const LoadingContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding-top: ${() => getResponsiveDimensions().isVerySmallScreen ? '30px' : '40px'};
 `;
 
 // ─────────────────────────────────────── Helpers ────────────────────────────────────────
@@ -248,9 +307,9 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
     return (
       <Container>
         <MaxWidthContainer>
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 40 }}>
+          <LoadingContainer>
             <ActivityIndicator size="large" color="#007aff" />
-          </View>
+          </LoadingContainer>
         </MaxWidthContainer>
       </Container>
     );
@@ -260,17 +319,15 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
     return (
       <Container>
         <MaxWidthContainer>
-          <View style={{ padding: 16, alignItems: "center" }}>
-            <Text style={{ color: "#dc2626", marginBottom: 12, textAlign: "center" }}>
-              Error: {error.message}
-            </Text>
+          <ErrorContainer>
+            <ErrorText>Error: {error.message}</ErrorText>
             <Button variant="outline" onPress={() => refetch()} style={{ width: "100%", marginBottom: 8 }}>
               Try again
             </Button>
             <Button variant="ghost" onPress={onBackToRegulations} style={{ width: "100%" }}>
               Back
             </Button>
-          </View>
+          </ErrorContainer>
         </MaxWidthContainer>
       </Container>
     );
@@ -282,7 +339,7 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
         {/* Header */}
         <HeaderContainer>
           <IconContainer>
-            <CalendarDaysIcon size={24} color="#ffffff" />
+            <CalendarDaysIcon size={getResponsiveDimensions().isSmallScreen ? 20 : 24} color="#ffffff" />
           </IconContainer>
           <Title>My Reservations</Title>
           <Subtitle>View, track, and manage all your bookings</Subtitle>
@@ -293,12 +350,16 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
           data={bookings}
           keyExtractor={(b) => b.id}
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
+          contentContainerStyle={{ 
+            paddingBottom: 16, 
+            flexGrow: 1,
+            paddingHorizontal: 0
+          }}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={{ alignItems: "center", paddingVertical: 40 }}>
-              <Text style={{ color: "#6b7280" }}>You don’t have any reservations yet.</Text>
-            </View>
+            <EmptyContainer>
+              <EmptyText>You don't have any reservations yet.</EmptyText>
+            </EmptyContainer>
           }
           renderItem={({ item: b }) => {
             const badge = statusBadge(b);
@@ -306,6 +367,7 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
             const totalFriends = b.participants?.length ?? 0;
             const confirmedFriends = b.participants?.filter((p) => p.isConfirmed).length ?? 0;
             const showCancel = typeof b.isCancellable === "boolean" ? b.isCancellable : isCancellableFallback(b);
+            const dims = getResponsiveDimensions();
 
             return (
               <Card $tone={tone}>
@@ -314,13 +376,13 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
                   <Badge $variant={badge.variant}>
                     <Row>
                       {badge.variant === "green" ? (
-                        <CheckIcon size={14} color="#166534" />
+                        <CheckIcon size={dims.isVerySmallScreen ? 12 : 14} color="#166534" />
                       ) : badge.variant === "yellow" ? (
-                        <ClockIcon size={14} color="#854d0e" />
+                        <ClockIcon size={dims.isVerySmallScreen ? 12 : 14} color="#854d0e" />
                       ) : badge.variant === "red" ? (
-                        <CircleXIcon size={14} color="#991b1b" />
+                        <CircleXIcon size={dims.isVerySmallScreen ? 12 : 14} color="#991b1b" />
                       ) : (
-                        <CalendarIcon size={14} color="#374151" />
+                        <CalendarIcon size={dims.isVerySmallScreen ? 12 : 14} color="#374151" />
                       )}
                       <BadgeText $variant={badge.variant}>{badge.text}</BadgeText>
                     </Row>
@@ -330,17 +392,17 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
                 <Line />
 
                 <Row>
-                  <CalendarIcon size={16} color="#6b7280" />
+                  <CalendarIcon size={dims.isVerySmallScreen ? 14 : 16} color="#6b7280" />
                   <SubText>{toHumanDate(b.bookingDate)}</SubText>
                   <Dot />
-                  <ClockIcon size={16} color="#6b7280" />
+                  <ClockIcon size={dims.isVerySmallScreen ? 14 : 16} color="#6b7280" />
                   <SubText>{toHumanTime(b.slot.theHour)}</SubText>
                 </Row>
 
                 {totalFriends > 0 && (
-                  <View style={{ marginTop: 8 }}>
+                  <View style={{ marginTop: dims.isVerySmallScreen ? 6 : 8 }}>
                     <Row>
-                      <UsersIcon size={16} color="#6b7280" />
+                      <UsersIcon size={dims.isVerySmallScreen ? 14 : 16} color="#6b7280" />
                       <SubText>
                         {confirmedFriends}/{totalFriends} friends confirmed
                       </SubText>
@@ -349,16 +411,28 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
                 )}
 
                 {showCancel && (
-                  <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+                  <View style={{ 
+                    flexDirection: "row", 
+                    gap: 8, 
+                    marginTop: dims.isVerySmallScreen ? 10 : 12 
+                  }}>
                     <Button
                       variant="outline"
                       onPress={() => cancelBooking({ variables: { bookingId: b.id } })}
                       disabled={cancelling}
-                      style={{ flex: 1, paddingVertical: 12 }}
+                      style={{ 
+                        flex: 1, 
+                        paddingVertical: dims.buttonPadding 
+                      }}
                     >
                       <Row style={{ justifyContent: "center" }}>
-                        <CircleXIcon size={16} color="#991b1b" />
-                        <Text style={{ marginLeft: 8, color: "#991b1b", fontWeight: "500" }}>
+                        <CircleXIcon size={dims.isVerySmallScreen ? 14 : 16} color="#991b1b" />
+                        <Text style={{ 
+                          marginLeft: 8, 
+                          color: "#991b1b", 
+                          fontWeight: "500",
+                          fontSize: dims.buttonTextSize
+                        }}>
                           Cancel
                         </Text>
                       </Row>
@@ -372,10 +446,22 @@ export const BookingsList: React.FC<Props> = ({ onBackToRegulations }) => {
 
         {/* Bottom button */}
         <FixedButtonsWrapper>
-          <Button variant="outline" onPress={onBackToRegulations} style={{ width: "100%", paddingVertical: 16 }}>
+          <Button 
+            variant="outline" 
+            onPress={onBackToRegulations} 
+            style={{ 
+              width: "100%", 
+              paddingVertical: getResponsiveDimensions().buttonPadding 
+            }}
+          >
             <Row style={{ justifyContent: "center" }}>
               <MoveLeftIcon size={16} color="#6b7280" />
-              <Text style={{ marginLeft: 8, color: "#6b7280", fontWeight: "500" }}>
+              <Text style={{ 
+                marginLeft: 8, 
+                color: "#6b7280", 
+                fontWeight: "500",
+                fontSize: getResponsiveDimensions().buttonTextSize
+              }}>
                 Back to Regulations
               </Text>
             </Row>

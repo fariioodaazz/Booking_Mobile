@@ -6,7 +6,7 @@ import Login from "src/screens/Login";
 import Home from "src/screens/Home";
 import { Regulations } from "src/screens/Regulations";
 import { FriendInvitationDemo } from "src/screens/FriendInvitation";
-import { WelcomePage } from "src/screens/WelcomePage"; // Import your new welcome page
+import { WelcomePage } from "src/screens/WelcomePage"; 
 import { ThemeProvider } from "styled-components/native";
 import { theme } from "src/components/styles/theme";
 import { BookingsList } from "src/screens/BookingsList";

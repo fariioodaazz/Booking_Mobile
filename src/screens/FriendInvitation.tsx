@@ -12,12 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { SimpleQuickListManager } from '../components/ui/SimpleQuickListManager';
 import { UserPlus, User, Zap, ArrowLeft, ArrowRight, Users, X, Search } from 'lucide-react-native';
 import { GET_MY_QUICK_LISTS } from '../api/quicklist/queries';
-import { DELETE_QUICK_LIST } from '../api/quicklist/mutations';
-import { CREATE_QUICK_LIST } from '../api/quicklist/mutations';
-import { UPDATE_QUICK_LIST } from '../api/quicklist/mutations';
-import { SEARCH_USER_BY_NU_ID } from '../api/quicklist/mutations';
+import { DELETE_QUICK_LIST,CREATE_QUICK_LIST,UPDATE_QUICK_LIST,SEARCH_USER_BY_NU_ID  } from '../api/quicklist/mutations';
 import type { QuickList as ApiQuickList } from '../api/quicklist/types';
-import { gql } from '@apollo/client';
 import { ProgressIndicator } from '../components/ui/ProgressBar';
 
 type Route = "home" | "regulations" | "friendInvitation";

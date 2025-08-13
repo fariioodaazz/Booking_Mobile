@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   TextInput, 
   Text, 
@@ -9,7 +9,9 @@ import {
   Animated,
   ActivityIndicator,
   Dimensions,
-  ScrollView
+  ScrollView,
+  Keyboard,
+  StatusBar
 } from "react-native";
 import { gql, useMutation } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +20,28 @@ import {TOKEN_AUTH} from "src/api/auth/queries";
 
 const { width, height } = Dimensions.get('window');
 
+// Responsive helper
+const getResponsiveDimensions = () => {
+  const isSmallScreen = height < 700;
+  const isTablet = width > 768;
+  const isVerySmallScreen = height < 600;
+  
+  return {
+    isSmallScreen,
+    isTablet,
+    isVerySmallScreen,
+    sidePadding: isSmallScreen ? 16 : 20,
+    formPadding: isVerySmallScreen ? 20 : isSmallScreen ? 30 : 40,
+    formInnerPadding: isVerySmallScreen ? 20 : 30,
+    titleSize: isVerySmallScreen ? 24 : isSmallScreen ? 26 : 28,
+    subtitleSize: isVerySmallScreen ? 14 : 16,
+    inputPadding: isSmallScreen ? 14 : 16,
+    inputFontSize: isSmallScreen ? 14 : 16,
+    buttonPadding: isSmallScreen ? 16 : 18,
+    buttonFontSize: isSmallScreen ? 16 : 18,
+    circleScale: isSmallScreen ? 0.8 : isTablet ? 1.2 : 1,
+  };
+};
 
 // Styled Components
 const Container = styled(SafeAreaView)`
@@ -25,36 +49,45 @@ const Container = styled(SafeAreaView)`
   background-color: #007AFF;
 `;
 
-const ScrollContainer = styled(ScrollView).attrs({
+const KeyboardAvoidingContainer = styled(KeyboardAvoidingView)`
+  flex: 1;
+`;
+
+const ScrollContainer = styled(ScrollView).attrs(() => ({
   contentContainerStyle: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: getResponsiveDimensions().sidePadding,
+    paddingTop: Math.max(getResponsiveDimensions().sidePadding, (StatusBar.currentHeight || 0) + 20),
   },
   keyboardShouldPersistTaps: 'handled',
-})`
+  showsVerticalScrollIndicator: false,
+}))`
   flex: 1;
 `;
 
 const FormContainer = styled.View`
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 25px;
-  padding: 40px 30px;
+  padding: ${() => getResponsiveDimensions().formInnerPadding}px;
   shadow-color: #000;
   shadow-offset: 0px 10px;
   shadow-opacity: 0.25;
   shadow-radius: 20px;
   elevation: 15;
-  margin-horizontal: 10px;
+  margin-horizontal: ${() => getResponsiveDimensions().isVerySmallScreen ? 5 : 10}px;
+  width: 100%;
+  max-width: ${() => getResponsiveDimensions().isTablet ? 450 : 400}px;
+  align-self: center;
 `;
 
 const HeaderContainer = styled.View`
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: ${() => getResponsiveDimensions().isVerySmallScreen ? 30 : 40}px;
 `;
 
 const Title = styled(Text)`
-  font-size: 28px;
+  font-size: ${() => getResponsiveDimensions().titleSize}px;
   font-weight: 700;
   color: #333333;
   margin-bottom: 8px;
@@ -62,18 +95,19 @@ const Title = styled(Text)`
 `;
 
 const Subtitle = styled(Text)`
-  font-size: 16px;
+  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
   color: #666666;
   text-align: center;
-  line-height: 22px;
+  line-height: ${() => getResponsiveDimensions().subtitleSize + 6}px;
+  padding-horizontal: 5px;
 `;
 
 const InputContainer = styled.View`
-  margin-bottom: 20px;
+  margin-bottom: ${() => getResponsiveDimensions().isVerySmallScreen ? 16 : 20}px;
 `;
 
 const InputLabel = styled(Text)`
-  font-size: 14px;
+  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
   font-weight: 600;
   color: #333333;
   margin-bottom: 8px;
@@ -84,9 +118,10 @@ const StyledTextInput = styled(TextInput)`
   background-color: #f8f9fa;
   border: 2px solid #e9ecef;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 16px;
+  padding: ${() => getResponsiveDimensions().inputPadding}px;
+  font-size: ${() => getResponsiveDimensions().inputFontSize}px;
   color: #333333;
+  min-height: ${() => getResponsiveDimensions().isVerySmallScreen ? 44 : 52}px;
 `;
 
 const FocusedInput = styled(StyledTextInput)`
@@ -101,7 +136,7 @@ interface ButtonProps {
 const LoginButton = styled(TouchableOpacity)<ButtonProps>`
   background-color: ${(props: ButtonProps) => props.disabled ? '#cccccc' : '#007AFF'};
   border-radius: 12px;
-  padding: 18px;
+  padding: ${() => getResponsiveDimensions().buttonPadding}px;
   align-items: center;
   justify-content: center;
   margin-top: 10px;
@@ -110,11 +145,12 @@ const LoginButton = styled(TouchableOpacity)<ButtonProps>`
   shadow-opacity: ${(props: ButtonProps) => props.disabled ? 0.1 : 0.3};
   shadow-radius: 8px;
   elevation: ${(props: ButtonProps) => props.disabled ? 2 : 6};
+  min-height: ${() => getResponsiveDimensions().isVerySmallScreen ? 48 : 56}px;
 `;
 
 const ButtonText = styled(Text)<ButtonProps>`
   color: #ffffff;
-  font-size: 18px;
+  font-size: ${() => getResponsiveDimensions().buttonFontSize}px;
   font-weight: 600;
 `;
 
@@ -122,18 +158,50 @@ const ErrorContainer = styled.View`
   background-color: #fee;
   border: 1px solid #fcc;
   border-radius: 8px;
-  padding: 12px;
+  padding: ${() => getResponsiveDimensions().isVerySmallScreen ? 10 : 12}px;
   margin-top: 16px;
 `;
 
 const ErrorText = styled(Text)`
   color: #cc0000;
-  font-size: 14px;
+  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
   text-align: center;
 `;
 
-
 // Decorative elements
+const getCircleProps = () => {
+  const { circleScale, isVerySmallScreen } = getResponsiveDimensions();
+  
+  return {
+    circles: [
+      { 
+        size: 100 * circleScale, 
+        top: isVerySmallScreen ? 40 : 60, 
+        left: -30 * circleScale, 
+        opacity: 0.1 
+      },
+      { 
+        size: 80 * circleScale, 
+        top: isVerySmallScreen ? 120 : 150, 
+        left: width - (50 * circleScale), 
+        opacity: 0.15 
+      },
+      { 
+        size: 120 * circleScale, 
+        top: height - (isVerySmallScreen ? 150 : 200), 
+        left: -40 * circleScale, 
+        opacity: 0.08 
+      },
+      { 
+        size: 90 * circleScale, 
+        top: height - (isVerySmallScreen ? 100 : 150), 
+        left: width - (60 * circleScale), 
+        opacity: 0.12 
+      },
+    ]
+  };
+};
+
 interface DecorativeCircleProps {
   size: number;
   top: number;
@@ -160,6 +228,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
   const [password, setPassword] = useState("");
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   
   const [tokenAuth, { loading, error }] = useMutation(TOKEN_AUTH);
   
@@ -167,6 +236,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const keyboardAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Entrance animation
@@ -188,6 +258,30 @@ export default function Login({ onLoggedIn }: LoginProps) {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Keyboard listeners
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+      Animated.timing(keyboardAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+      Animated.timing(keyboardAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
   }, []);
 
   const handleLogin = async () => {
@@ -205,27 +299,42 @@ export default function Login({ onLoggedIn }: LoginProps) {
   };
 
   const isFormValid = email.trim() !== "" && password.trim() !== "";
+  const { circles } = getCircleProps();
 
   return (
     <Container>
       {/* Decorative background elements */}
-      <DecorativeCircle size={100} top={60} left={-30} opacity={0.1} />
-      <DecorativeCircle size={80} top={150} left={width - 50} opacity={0.15} />
-      <DecorativeCircle size={120} top={height - 200} left={-40} opacity={0.08} />
-      <DecorativeCircle size={90} top={height - 150} left={width - 60} opacity={0.12} />
+      {circles.map((circle, index) => (
+        <DecorativeCircle
+          key={index}
+          size={circle.size}
+          top={circle.top}
+          left={circle.left}
+          opacity={circle.opacity}
+        />
+      ))}
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
+      <KeyboardAvoidingContainer
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        <ScrollContainer>
+        <ScrollContainer
+          extraScrollHeight={20}
+          enableOnAndroid={true}
+          enableAutomaticScroll={Platform.OS === 'ios'}
+        >
           <Animated.View
             style={{
               opacity: fadeAnim,
               transform: [
                 { translateY: slideAnim },
-                { scale: scaleAnim }
+                { scale: scaleAnim },
+                {
+                  translateY: keyboardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -50],
+                  }),
+                },
               ],
             }}
           >
@@ -247,6 +356,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
                     onFocus={() => setEmailFocused(true)}
                     onBlur={() => setEmailFocused(false)}
                     autoCorrect={false}
+                    returnKeyType="next"
                   />
                 ) : (
                   <StyledTextInput
@@ -258,6 +368,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
                     onFocus={() => setEmailFocused(true)}
                     onBlur={() => setEmailFocused(false)}
                     autoCorrect={false}
+                    returnKeyType="next"
                   />
                 )}
               </InputContainer>
@@ -272,6 +383,8 @@ export default function Login({ onLoggedIn }: LoginProps) {
                     onChangeText={setPassword}
                     onFocus={() => setPasswordFocused(true)}
                     onBlur={() => setPasswordFocused(false)}
+                    returnKeyType="done"
+                    onSubmitEditing={isFormValid ? handleLogin : undefined}
                   />
                 ) : (
                   <StyledTextInput
@@ -281,6 +394,8 @@ export default function Login({ onLoggedIn }: LoginProps) {
                     onChangeText={setPassword}
                     onFocus={() => setPasswordFocused(true)}
                     onBlur={() => setPasswordFocused(false)}
+                    returnKeyType="done"
+                    onSubmitEditing={isFormValid ? handleLogin : undefined}
                   />
                 )}
               </InputContainer>
@@ -312,7 +427,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
             </FormContainer>
           </Animated.View>
         </ScrollContainer>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingContainer>
     </Container>
   );
 }

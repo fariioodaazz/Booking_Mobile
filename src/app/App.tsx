@@ -6,18 +6,17 @@ import Login from "src/screens/Login";
 import Home from "src/screens/Home";
 import { Regulations } from "src/screens/Regulations";
 import { FriendInvitationDemo } from "src/screens/FriendInvitation";
+import { WelcomePage } from "src/screens/WelcomePage"; // Import your new welcome page
 import { ThemeProvider } from "styled-components/native";
 import { theme } from "src/components/styles/theme";
 
-
-
 type Route = "home" | "regulations" | "friendInvitation";
-
 
 const DEFAULT_CATEGORY_ID = "1";
 
 export default function App() {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
+  const [showWelcome, setShowWelcome] = useState<boolean | null>(null);
   const [route, setRoute] = useState<Route>("home");
 
   // Friend invitation state
@@ -25,13 +24,25 @@ export default function App() {
   const [quickLists, setQuickLists] = useState<any[]>([]);
 
   useEffect(() => {
-    (async () => setHasToken(!!(await AsyncStorage.getItem("token"))))();
+    (async () => {
+      const token = await AsyncStorage.getItem("token");
+      const hasSeenWelcome = await AsyncStorage.getItem("hasSeenWelcome");
+      
+      setHasToken(!!token);
+      setShowWelcome(!hasSeenWelcome && !token); // Show welcome only if user hasn't seen it and isn't logged in
+    })();
   }, []);
+
+  const handleWelcomeComplete = async () => {
+    await AsyncStorage.setItem("hasSeenWelcome", "true");
+    setShowWelcome(false);
+  };
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("token");
       await apolloClient.clearStore();
+      // Don't remove hasSeenWelcome so user doesn't see welcome again after logout
     } finally {
       setHasToken(false);
       setRoute("home");
@@ -72,12 +83,15 @@ export default function App() {
     setQuickLists(prev => prev.filter(list => list.id !== listId));
   };
 
-  if (hasToken === null) return null;
+  // Show loading while checking initial state
+  if (hasToken === null || showWelcome === null) return null;
 
   return (
     <ThemeProvider theme={theme}>
       <AppProviders>
-        {hasToken ? (
+        {showWelcome ? (
+          <WelcomePage onLogIn={handleWelcomeComplete} />
+        ) : hasToken ? (
           route === "home" ? (
             <Home
               onBookCourt={() => setRoute("regulations")}

@@ -90,7 +90,7 @@ const StyledTextInput = styled(TextInput)`
 `;
 
 const FocusedInput = styled(StyledTextInput)`
-  border-color: #667eea;
+  border-color: #007AFF;
   background-color: #ffffff;
 `;
 
@@ -99,13 +99,13 @@ interface ButtonProps {
 }
 
 const LoginButton = styled(TouchableOpacity)<ButtonProps>`
-  background-color: ${(props: ButtonProps) => props.disabled ? '#cccccc' : '#667eea'};
+  background-color: ${(props: ButtonProps) => props.disabled ? '#cccccc' : '#007AFF'};
   border-radius: 12px;
   padding: 18px;
   align-items: center;
   justify-content: center;
   margin-top: 10px;
-  shadow-color: #667eea;
+  shadow-color: #007AFF;
   shadow-offset: 0px 4px;
   shadow-opacity: ${(props: ButtonProps) => props.disabled ? 0.1 : 0.3};
   shadow-radius: 8px;

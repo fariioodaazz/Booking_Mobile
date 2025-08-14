@@ -10,14 +10,17 @@ import { WelcomePage } from "src/screens/WelcomePage";
 import { ThemeProvider } from "styled-components/native";
 import { theme } from "src/components/styles/theme";
 import { BookingsList } from "src/screens/BookingsList";
+import { Notifications } from "src/screens/Notifications";
+import { NotificationResponse } from "src/screens/NotificationResponse";
 
-type Route = "home" | "regulations" | "friendInvitation" | "bookings";
+type Route = "home" | "regulations" | "friendInvitation" | "bookings" | "notifications" | "notificationResponse";
 
 
 export default function App() {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
   const [showWelcome, setShowWelcome] = useState<boolean | null>(null);
   const [route, setRoute] = useState<Route>("home");
+  const [selectedNotification, setSelectedNotification] = useState<any>(null);
 
   // Friend invitation state
   const [invitedFriends, setInvitedFriends] = useState<any[]>([]);
@@ -83,6 +86,29 @@ export default function App() {
     setQuickLists(prev => prev.filter(list => list.id !== listId));
   };
 
+  // Notification handlers
+  const handleTestNotification = () => {
+    console.log("Test notification triggered");
+    setRoute("notificationResponse");
+  };
+
+  const handleViewNotifications = () => {
+    setRoute("notifications");
+  };
+
+  const handleNotificationPress = (notification: any) => {
+    // Check if notification is expired
+    const isExpired = notification.expiresAt && new Date(notification.expiresAt) < new Date();
+    
+    if (!notification.isInfo && notification.relatedBooking && !isExpired) {
+      setSelectedNotification(notification);
+      setRoute("notificationResponse");
+    } else if (isExpired) {
+      console.log("Cannot open expired notification");
+      // Optionally show a toast/alert that the notification has expired
+    }
+  };
+
   // Show loading while checking initial state
   if (hasToken === null || showWelcome === null) return null;
 
@@ -96,6 +122,8 @@ export default function App() {
             <Home
               onBookCourt={() => setRoute("regulations")}
               onLogout={handleLogout}
+              onTestNotification={handleTestNotification}
+              onViewNotifications={handleViewNotifications}
             />
           ) : route === "friendInvitation" ? (
             <FriendInvitationDemo />
@@ -111,6 +139,24 @@ export default function App() {
             />
           ) : route === "bookings" ? (
             <BookingsList onBackToRegulations={() => setRoute("regulations")} />
+          ) : route === "notifications" ? (
+            <Notifications
+              onBack={() => setRoute("home")}
+              onNotificationPress={handleNotificationPress}
+            />
+          ) : route === "notificationResponse" ? (
+            <NotificationResponse
+              bookingId={selectedNotification?.relatedBooking?.id || "7"} // Use mock ID if no notification selected
+              onAccept={() => {
+                console.log("Invitation accepted!");
+                setRoute("notifications");
+              }}
+              onDecline={() => {
+                console.log("Invitation declined!");
+                setRoute("notifications");
+              }}
+              onClose={() => setRoute(selectedNotification ? "notifications" : "home")}
+            />
           ) : (
             <></>
           )

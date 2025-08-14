@@ -5,5 +5,6 @@ export * as BookingAPI from './booking';
 export * as UserAPI from './user';
 export * as AuthAPI from './auth';
 export * as QuickListAPI from './quicklist';
+export * as NotificationsAPI from './notifications';
 export * as SharedAPI from './shared';
 

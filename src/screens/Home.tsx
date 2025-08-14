@@ -206,9 +206,11 @@ const VolleyballIconButton = () => (
 type Props = {
   onBookCourt: () => void;
   onLogout: () => void;
+  onTestNotification: () => void;
+  onViewNotifications?: () => void;
 };
 
-export const Home: React.FC<Props> = ({ onBookCourt, onLogout }) => {
+export const Home: React.FC<Props> = ({ onBookCourt, onLogout, onTestNotification, onViewNotifications }) => {
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -276,6 +278,22 @@ export const Home: React.FC<Props> = ({ onBookCourt, onLogout }) => {
                 </ActionIcon>
                 <ActionButtonText>Book a Court</ActionButtonText>
               </ActionButton>
+              
+              <ActionButton onPress={onTestNotification} activeOpacity={0.8}>
+                <ActionIcon>
+                  <Text style={{ color: '#fff', fontSize: 18 }}>📩</Text>
+                </ActionIcon>
+                <ActionButtonText>Test Notification</ActionButtonText>
+              </ActionButton>
+              
+              {onViewNotifications && (
+                <ActionButton onPress={onViewNotifications} activeOpacity={0.8}>
+                  <ActionIcon>
+                    <Text style={{ color: '#fff', fontSize: 18 }}>🔔</Text>
+                  </ActionIcon>
+                  <ActionButtonText>View Notifications</ActionButtonText>
+                </ActionButton>
+              )}
               
               <ActionButton onPress={onLogout} activeOpacity={0.8}>
                 <ActionIcon>

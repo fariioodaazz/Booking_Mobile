@@ -384,8 +384,6 @@ export const Regulations: React.FC<RegulationsProps> = ({
     return <PolicyIcon />;
   };
 
-  const sectionsToShow = sections.length > 0 ? sections : "No Available Regulations";
-
   return (
     <Container>
       <MaxWidthContainer>
@@ -411,16 +409,33 @@ export const Regulations: React.FC<RegulationsProps> = ({
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ flexGrow: 1 }}
             >
-              {sectionsToShow.map((section: any, index: number) => (
-                <CollapsibleSection
-                  key={index}
-                  title={section.title}
-                  items={section.items || []}
-                  icon={getSectionIcon(section.title)}
-                  defaultExpanded={index === 0}
-                  isLast={index === sectionsToShow.length - 1}
-                />
-              ))}
+              {sections.length > 0 ? (
+                sections.map((section: any, index: number) => (
+                  <CollapsibleSection
+                    key={index}
+                    title={section.title}
+                    items={section.items || []}
+                    icon={getSectionIcon(section.title)}
+                    defaultExpanded={index === 0}
+                    isLast={index === sections.length - 1}
+                  />
+                ))
+              ) : (
+                <View style={{ 
+                  flex: 1, 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  padding: 40 
+                }}>
+                  <Text style={{ 
+                    fontSize: 16, 
+                    color: '#6b7280', 
+                    textAlign: 'center' 
+                  }}>
+                    No Available Regulations
+                  </Text>
+                </View>
+              )}
             </RegulationsScrollView>
           </RegulationsCard>
         </ContentContainer>

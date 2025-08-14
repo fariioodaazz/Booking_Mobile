@@ -10,3 +10,21 @@ export const CANCEL_BOOKING_MUTATION = gql`
     }
   }
 `;
+
+export const ACCEPT_BOOKING_INVITE = gql`
+  mutation AcceptBookingInvite($bookingId: ID!) {
+    acceptBookingInvite(bookingId: $bookingId) {
+      success
+      message
+    }
+  }
+`;
+
+export const DECLINE_BOOKING_INVITE = gql`
+  mutation DeclineBookingInvite($bookingId: ID!) {
+    declineBookingInvite(bookingId: $bookingId) {
+      success
+      message
+    }
+  }
+`;

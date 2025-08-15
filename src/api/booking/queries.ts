@@ -46,3 +46,5 @@ export const GET_COMPLETE_INVITED_BOOKING_DETAILS = gql`
     }
   }
 `;
+
+

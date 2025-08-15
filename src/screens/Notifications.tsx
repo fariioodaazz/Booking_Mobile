@@ -46,7 +46,8 @@ interface NotificationTitleProps {
 const Container = styled(ScrollView)`
   flex: 1;
   background-color: #ffffff;
-  padding: 8px;
+  padding: 5%;
+  margin-top: 2px;
 `;
 
 const MaxWidthContainer = styled.View`

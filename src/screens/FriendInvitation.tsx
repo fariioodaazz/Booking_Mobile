@@ -29,6 +29,7 @@ const Container = styled(ScrollView)`
   flex: 1;
   background-color: #ffffff;
   padding: 8px;
+  padding-bottom: 15px;
 `;
 
 const MaxWidthContainer = styled.View`
@@ -38,6 +39,7 @@ const MaxWidthContainer = styled.View`
 `;
 
 const HeaderContainer = styled.View`
+  align-items: center;
   margin-bottom: 16px;
   padding-top: 15px;
 `;

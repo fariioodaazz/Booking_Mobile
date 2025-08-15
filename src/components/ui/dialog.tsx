@@ -1,7 +1,13 @@
+// app/components/ui/dialog.tsx
 import React from "react";
+import {
+  Modal,
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  StyleSheet,
+} from "react-native";
 import styled from "styled-components/native";
-import Modal from "react-native-modal";
-import { TouchableOpacity } from "react-native";
 import { X } from "lucide-react-native";
 
 type DialogProps = {
@@ -31,18 +37,11 @@ type DialogDescriptionProps = {
   style?: any;
 };
 
-const Overlay = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-`;
-
 const Content = styled.View`
   background-color: #ffffff;
   padding: 24px;
   border-radius: 12px;
-  width: 100%;
+  width: 90%;
   max-width: 400px;
   shadow-color: #000;
   shadow-offset: 0px 4px;
@@ -93,16 +92,20 @@ const Description = styled.Text`
   line-height: 20px;
 `;
 
+// Main Dialog wrapper
 export function Dialog({ visible, onClose, children, style }: DialogProps) {
   return (
     <Modal
-      isVisible={visible}
-      onBackdropPress={onClose}
-      onBackButtonPress={onClose}
-      backdropTransitionOutTiming={0}
-      style={{ margin: 0, justifyContent: "center", alignItems: "center" }}
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
     >
-      <Overlay>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.backdrop} />
+      </TouchableWithoutFeedback>
+
+      <View style={styles.center}>
         <Content style={style}>
           <CloseButtonContainer>
             <CloseButton onPress={onClose}>
@@ -111,35 +114,12 @@ export function Dialog({ visible, onClose, children, style }: DialogProps) {
           </CloseButtonContainer>
           {children}
         </Content>
-      </Overlay>
+      </View>
     </Modal>
   );
 }
 
-export function DialogTrigger({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
-
-export function DialogClose({ children, onPress }: { children: React.ReactNode; onPress?: () => void }) {
-  return (
-    <TouchableOpacity onPress={onPress}>
-      {children}
-    </TouchableOpacity>
-  );
-}
-
-export function DialogOverlay({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
-
-export function DialogPortal({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
-
-export function DialogContent({ children, style }: { children: React.ReactNode; style?: any }) {
-  return <Content style={style}>{children}</Content>;
-}
-
+// Subcomponents
 export function DialogHeader({ children, style }: DialogHeaderProps) {
   return <Header style={style}>{children}</Header>;
 }
@@ -155,3 +135,21 @@ export function DialogTitle({ children, style }: DialogTitleProps) {
 export function DialogDescription({ children, style }: DialogDescriptionProps) {
   return <Description style={style}>{children}</Description>;
 }
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+});

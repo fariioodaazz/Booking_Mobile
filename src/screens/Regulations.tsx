@@ -5,14 +5,12 @@ import {
   View, 
   Text, 
   TouchableOpacity,
-  Dimensions,
-  StatusBar
+  Dimensions
 } from "react-native";
 import styled from 'styled-components/native';
 import { useQuery } from "@apollo/client";
 import { Button } from "../components/ui/button";
 import { REGULATIONS_PAGE_QUERY } from "../api/regulations/queries";
-import { SectionProps, RegulationsProps } from "../api/regulations/types";
 
 import CalendarDaysIcon from '../../assets/CalendarDaysIcon';
 import CalendarIcon from '../../assets/CalendarIcon';
@@ -24,96 +22,80 @@ import MoveLeftIcon from '../../assets/MoveLeftIcon';
 
 const { width, height } = Dimensions.get('window');
 
-// Responsive helper
-const getResponsiveDimensions = () => {
-  const isSmallScreen = height < 700;
-  const isTablet = width > 768;
-  const isVerySmallScreen = height < 600;
-  
-  return {
-    isSmallScreen,
-    isTablet,
-    isVerySmallScreen,
-    maxWidth: isTablet ? 500 : 400,
-    sidePadding: isSmallScreen ? 16 : 20,
-    containerPaddingTop: (StatusBar.currentHeight || 0) + (isVerySmallScreen ? 8 : 10),
-    containerPaddingBottom: isVerySmallScreen ? 80 : 100,
-    headerPaddingTop: isVerySmallScreen ? 10 : 15,
-    headerMarginBottom: isVerySmallScreen ? 12 : 15,
-    iconSize: isSmallScreen ? 48 : 56,
-    titleSize: isSmallScreen ? 22 : 24,
-    subtitleSize: isSmallScreen ? 14 : 16,
-    cardMinHeight: isVerySmallScreen ? 300 : isSmallScreen ? 350 : 410,
-    buttonAreaHeight: isVerySmallScreen ? 140 : 180,
-    buttonBottomPadding: isVerySmallScreen ? 40 : 60,
-  };
+type Props = {
+  categoryName: string;
+  onShowReservations: () => void;
+  onReserve: () => void;
+  onBackHome?: () => void;
+
+  /** Reusability props */
+  headerTitle?: string;
+  headerSubtitle?: string;
+  policiesTitle?: string;
 };
 
-
-// Styled Components
+// Styled Components with percentage-based sizing
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  padding-top: ${() => getResponsiveDimensions().containerPaddingTop}px;
-  padding-bottom: ${() => getResponsiveDimensions().containerPaddingBottom}px;
+  padding-top: 8%;
+  padding-bottom: 15%;
 `;
 
 const MaxWidthContainer = styled.View`
-  max-width: ${() => getResponsiveDimensions().maxWidth}px;
+  width: 92%;
   margin: 0 auto;
-  width: 100%;
   flex: 1;
-  padding-horizontal: ${() => getResponsiveDimensions().sidePadding}px;
 `;
 
 const HeaderContainer = styled.View`
   align-items: center;
-  margin-bottom: ${() => getResponsiveDimensions().headerMarginBottom}px;
-  padding-top: ${() => getResponsiveDimensions().headerPaddingTop}px;
+  margin-bottom: 4%;
+  padding-top: 5%;
 `;
 
 const IconContainer = styled.View`
-  width: ${() => getResponsiveDimensions().iconSize}px;
-  height: ${() => getResponsiveDimensions().iconSize}px;
-  border-radius: ${() => getResponsiveDimensions().iconSize / 2}px;
+  width: ${width * 0.14}px;
+  height: ${width * 0.14}px;
+  border-radius: ${width * 0.07}px;
   background-color: #007AFF;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-bottom: 2%;
 `;
 
 const Title = styled.Text`
   color: #007AFF;
-  font-size: ${() => getResponsiveDimensions().titleSize}px;
+  font-size: ${Math.min(width * 0.06, 24)}px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 1%;
   text-align: center;
 `;
 
 const Subtitle = styled.Text`
   color: #6b7280;
-  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
+  font-size: ${Math.min(width * 0.04, 16)}px;
   text-align: center;
-  padding-horizontal: 10px;
+  padding-horizontal: 5%;
 `;
 
 const CategoryChip = styled.View`
   background-color: #007AFF10;
   border-radius: 16px;
-  padding-horizontal: 12px;
-  padding-vertical: 6px;
-  margin-top: 12px;
+  padding-horizontal: 3%;
+  padding-vertical: 1.5%;
+  margin-top: 3%;
 `;
 
 const CategoryText = styled.Text`
   color: #007AFF;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '14px'};
+  font-size: ${Math.min(width * 0.035, 14)}px;
   font-weight: 500;
 `;
 
 const ContentContainer = styled.View`
   flex: 1;
-  margin-bottom: ${() => getResponsiveDimensions().buttonAreaHeight}px;
+  margin-bottom: 25%;
 `;
 
 const RegulationsCard = styled.View`
@@ -126,8 +108,7 @@ const RegulationsCard = styled.View`
   shadow-opacity: 0.05;
   shadow-radius: 2px;
   elevation: 1;
-  flex: 1;
-  min-height: ${() => getResponsiveDimensions().cardMinHeight}px;
+  min-height: ${height * 0.5}px;
 `;
 
 const RegulationsScrollView = styled(ScrollView)`
@@ -137,30 +118,30 @@ const RegulationsScrollView = styled(ScrollView)`
 const SectionHeaderCollapsed = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'};
+  padding: 4%;
   border-bottom-width: 1px;
   border-bottom-color: #f3f4f6;
-  min-height: 50px;
+  min-height: ${height * 0.065}px;
 `;
 
 const SectionHeaderExpanded = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'};
-  min-height: 50px;
+  padding: 4%;
+  min-height: ${height * 0.065}px;
 `;
 
 const SectionIconContainer = styled.View`
   width: 24px;
   height: 24px;
-  margin-right: 12px;
+  margin-right: 3%;
   align-items: center;
   justify-content: center;
 `;
 
 const SectionTitleText = styled.Text`
   color: #007AFF;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '14px' : '16px'};
+  font-size: ${Math.min(width * 0.04, 16)}px;
   font-weight: 500;
   flex: 1;
 `;
@@ -173,15 +154,15 @@ const ChevronContainer = styled.View`
 `;
 
 const SectionContent = styled.View`
-  padding: 0px ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'} ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'} ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'};
+  padding: 0 4% 4% 4%;
 `;
 
 const BulletPoint = styled.Text`
   color: #374151;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '14px'};
-  line-height: ${() => getResponsiveDimensions().isSmallScreen ? '18px' : '20px'};
-  margin-bottom: 8px;
-  margin-left: 8px;
+  font-size: ${Math.min(width * 0.035, 14)}px;
+  line-height: ${Math.min(width * 0.05, 20)}px;
+  margin-bottom: 2%;
+  margin-left: 2%;
 `;
 
 const SectionDivider = styled.View`
@@ -194,54 +175,53 @@ const BannerContainer = styled.View`
   border-width: 1px;
   border-color: #fde68a;
   border-radius: 12px;
-  padding: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '16px'};
-  margin-top: 16px;
+  padding: 4%;
+  margin-top: 4%;
 `;
 
 const BannerTitle = styled.Text`
   color: #92400e;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '14px' : '16px'};
+  font-size: ${Math.min(width * 0.04, 16)}px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 2%;
 `;
 
 const BannerText = styled.Text`
   color: #92400e;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '12px' : '14px'};
-  margin-bottom: 4px;
+  font-size: ${Math.min(width * 0.035, 14)}px;
+  margin-bottom: 1%;
 `;
 
 const ButtonsContainer = styled.View`
-  gap: 12px;
+  gap: 3%;
   width: 100%;
 `;
 
 const FixedButtonsWrapper = styled.View`
   position: absolute;
-  bottom: ${() => getResponsiveDimensions().buttonBottomPadding}px;
-  left: ${() => getResponsiveDimensions().sidePadding}px;
-  right: ${() => getResponsiveDimensions().sidePadding}px;
+  bottom: 8%;
+  left: 4%;
+  right: 4%;
   align-items: center;
-  padding-top: 0px;
 `;
 
 const ErrorContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 4%;
 `;
 
 const ErrorText = styled.Text`
   color: #dc2626;
-  font-size: ${() => getResponsiveDimensions().isSmallScreen ? '14px' : '16px'};
-  margin-bottom: 16px;
+  font-size: ${Math.min(width * 0.04, 16)}px;
+  margin-bottom: 4%;
   text-align: center;
 `;
 
 // Icon Components
 const CalendarIconMain = () => (
-  <CalendarIcon size={getResponsiveDimensions().isSmallScreen ? 20 : 24} color="#ffffff" />
+  <CalendarIcon size={Math.min(width * 0.06, 24)} color="#ffffff" />
 );
 
 const CalendarIconButton = ({ color }: { color: string }) => (
@@ -276,6 +256,14 @@ const CheckInIcon = () => (
   <MapPinIcon size={20} color="#007AFF" />
 );
 
+// Section Component
+interface SectionProps {
+  title: string;
+  items: string[];
+  icon: React.ReactNode;
+  defaultExpanded?: boolean;
+  isLast?: boolean;
+}
 
 const CollapsibleSection: React.FC<SectionProps> = ({ 
   title, 
@@ -319,7 +307,7 @@ const CollapsibleSection: React.FC<SectionProps> = ({
   );
 };
 
-export const Regulations: React.FC<RegulationsProps> = ({
+export const Regulations: React.FC<Props> = ({
   categoryName,
   onShowReservations,
   onReserve,
@@ -354,7 +342,7 @@ export const Regulations: React.FC<RegulationsProps> = ({
             <Button 
               variant="outline" 
               onPress={() => refetch()} 
-              style={{ width: '100%', marginBottom: 12 }}
+              style={{ width: '100%', marginBottom: '3%' }}
             >
               Try again
             </Button>
@@ -384,6 +372,8 @@ export const Regulations: React.FC<RegulationsProps> = ({
     return <PolicyIcon />;
   };
 
+  const sectionsToShow = sections.length > 0 ? sections : "No Available Regulations";
+
   return (
     <Container>
       <MaxWidthContainer>
@@ -409,33 +399,16 @@ export const Regulations: React.FC<RegulationsProps> = ({
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ flexGrow: 1 }}
             >
-              {sections.length > 0 ? (
-                sections.map((section: any, index: number) => (
-                  <CollapsibleSection
-                    key={index}
-                    title={section.title}
-                    items={section.items || []}
-                    icon={getSectionIcon(section.title)}
-                    defaultExpanded={index === 0}
-                    isLast={index === sections.length - 1}
-                  />
-                ))
-              ) : (
-                <View style={{ 
-                  flex: 1, 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  padding: 40 
-                }}>
-                  <Text style={{ 
-                    fontSize: 16, 
-                    color: '#6b7280', 
-                    textAlign: 'center' 
-                  }}>
-                    No Available Regulations
-                  </Text>
-                </View>
-              )}
+              {sectionsToShow.map((section: any, index: number) => (
+                <CollapsibleSection
+                  key={index}
+                  title={section.title}
+                  items={section.items || []}
+                  icon={getSectionIcon(section.title)}
+                  defaultExpanded={index === 0}
+                  isLast={index === sectionsToShow.length - 1}
+                />
+              ))}
             </RegulationsScrollView>
           </RegulationsCard>
         </ContentContainer>
@@ -450,7 +423,7 @@ export const Regulations: React.FC<RegulationsProps> = ({
             size="lg" 
             style={{ 
               width: '100%', 
-              paddingVertical: getResponsiveDimensions().isSmallScreen ? 14 : 16,
+              paddingVertical: '4%',
               opacity: isEligible ? 1 : 0.5
             }}
             disabled={!isEligible}
@@ -461,9 +434,9 @@ export const Regulations: React.FC<RegulationsProps> = ({
                   <CalendarIconButton color="#ffffff" />
                   <Text style={{ 
                     color: '#ffffff', 
-                    fontSize: getResponsiveDimensions().isSmallScreen ? 14 : 16, 
+                    fontSize: Math.min(width * 0.04, 16), 
                     fontWeight: '500', 
-                    marginLeft: 8 
+                    marginLeft: '2%' 
                   }}>
                     Reserve a Court
                   </Text>
@@ -473,9 +446,9 @@ export const Regulations: React.FC<RegulationsProps> = ({
                   <CalendarIconButton color="#000" />
                   <Text style={{ 
                     color: '#000', 
-                    fontSize: getResponsiveDimensions().isSmallScreen ? 14 : 16, 
+                    fontSize: Math.min(width * 0.04, 16), 
                     fontWeight: '500', 
-                    marginLeft: 8 
+                    marginLeft: '2%' 
                   }}>
                     {EligReason}
                   </Text>
@@ -487,15 +460,15 @@ export const Regulations: React.FC<RegulationsProps> = ({
           <Button 
             onPress={onShowReservations} 
             variant="outline" 
-            style={{ width: '100%', paddingVertical: getResponsiveDimensions().isSmallScreen ? 14 : 16 }}
+            style={{ width: '100%', paddingVertical: '4%' }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <CalendarDaysIconButton />
               <Text style={{ 
                 color: '#007AFF', 
-                fontSize: getResponsiveDimensions().isSmallScreen ? 14 : 16, 
+                fontSize: Math.min(width * 0.04, 16), 
                 fontWeight: '500', 
-                marginLeft: 8 
+                marginLeft: '2%' 
               }}>
                 Show All Reservations
               </Text>
@@ -505,15 +478,15 @@ export const Regulations: React.FC<RegulationsProps> = ({
           <Button 
             onPress={onBackHome} 
             variant="outline"
-            style={{ width: '100%', paddingVertical: getResponsiveDimensions().isSmallScreen ? 14 : 16 }}
+            style={{ width: '100%', paddingVertical: '4%' }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <BackIcon />
               <Text style={{ 
                 color: '#6b7280', 
-                fontSize: getResponsiveDimensions().isSmallScreen ? 14 : 16, 
+                fontSize: Math.min(width * 0.04, 16), 
                 fontWeight: '500', 
-                marginLeft: 8 
+                marginLeft: '2%' 
               }}>
                 Back to Home
               </Text>

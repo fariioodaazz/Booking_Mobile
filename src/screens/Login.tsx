@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { 
   TextInput, 
   Text, 
@@ -10,8 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
-  Keyboard,
-  StatusBar
+  Keyboard
 } from "react-native";
 import { gql, useMutation } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,112 +19,89 @@ import {TOKEN_AUTH} from "src/api/auth/queries";
 
 const { width, height } = Dimensions.get('window');
 
-// Responsive helper
-const getResponsiveDimensions = () => {
-  const isSmallScreen = height < 700;
-  const isTablet = width > 768;
-  const isVerySmallScreen = height < 600;
-  
-  return {
-    isSmallScreen,
-    isTablet,
-    isVerySmallScreen,
-    sidePadding: isSmallScreen ? 16 : 20,
-    formPadding: isVerySmallScreen ? 20 : isSmallScreen ? 30 : 40,
-    formInnerPadding: isVerySmallScreen ? 20 : 30,
-    titleSize: isVerySmallScreen ? 24 : isSmallScreen ? 26 : 28,
-    subtitleSize: isVerySmallScreen ? 14 : 16,
-    inputPadding: isSmallScreen ? 14 : 16,
-    inputFontSize: isSmallScreen ? 14 : 16,
-    buttonPadding: isSmallScreen ? 16 : 18,
-    buttonFontSize: isSmallScreen ? 16 : 18,
-    circleScale: isSmallScreen ? 0.8 : isTablet ? 1.2 : 1,
-  };
-};
-
-// Styled Components
+// Styled Components with percentage-based sizing
 const Container = styled(SafeAreaView)`
   flex: 1;
-  background-color: #007AFF;
+  background-color: #fff;
 `;
 
 const KeyboardAvoidingContainer = styled(KeyboardAvoidingView)`
   flex: 1;
 `;
 
-const ScrollContainer = styled(ScrollView).attrs(() => ({
+const ScrollContainer = styled(ScrollView).attrs({
   contentContainerStyle: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: getResponsiveDimensions().sidePadding,
-    paddingTop: Math.max(getResponsiveDimensions().sidePadding, (StatusBar.currentHeight || 0) + 20),
+    padding: '5%',
+    paddingTop: '10%',
   },
   keyboardShouldPersistTaps: 'handled',
   showsVerticalScrollIndicator: false,
-}))`
+})`
   flex: 1;
 `;
 
 const FormContainer = styled.View`
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #007AFF;
   border-radius: 25px;
-  padding: ${() => getResponsiveDimensions().formInnerPadding}px;
+  padding: 8%;
   shadow-color: #000;
   shadow-offset: 0px 10px;
   shadow-opacity: 0.25;
   shadow-radius: 20px;
   elevation: 15;
-  margin-horizontal: ${() => getResponsiveDimensions().isVerySmallScreen ? 5 : 10}px;
-  width: 100%;
-  max-width: ${() => getResponsiveDimensions().isTablet ? 450 : 400}px;
+  margin-horizontal: 2%;
+  width: 96%;
+  max-width: 90%;
   align-self: center;
 `;
 
 const HeaderContainer = styled.View`
   align-items: center;
-  margin-bottom: ${() => getResponsiveDimensions().isVerySmallScreen ? 30 : 40}px;
+  margin-bottom: 8%;
 `;
 
 const Title = styled(Text)`
-  font-size: ${() => getResponsiveDimensions().titleSize}px;
+  font-size: ${Math.min(width * 0.07, 28)}px;
   font-weight: 700;
-  color: #333333;
-  margin-bottom: 8px;
+  color: #fff;
+  margin-bottom: 2%;
   text-align: center;
 `;
 
 const Subtitle = styled(Text)`
-  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
-  color: #666666;
+  font-size: ${Math.min(width * 0.04, 16)}px;
+  color: #fff;
   text-align: center;
-  line-height: ${() => getResponsiveDimensions().subtitleSize + 6}px;
-  padding-horizontal: 5px;
+  line-height: ${Math.min(width * 0.055, 22)}px;
+  padding-horizontal: 2%;
 `;
 
 const InputContainer = styled.View`
-  margin-bottom: ${() => getResponsiveDimensions().isVerySmallScreen ? 16 : 20}px;
+  margin-bottom: 5%;
 `;
 
 const InputLabel = styled(Text)`
-  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
+  font-size: ${Math.min(width * 0.035, 14)}px;
   font-weight: 600;
-  color: #333333;
-  margin-bottom: 8px;
-  margin-left: 4px;
+  color: #fff;
+  margin-bottom: 2%;
+  margin-left: 1%;
 `;
 
 const StyledTextInput = styled(TextInput)`
   background-color: #f8f9fa;
   border: 2px solid #e9ecef;
   border-radius: 12px;
-  padding: ${() => getResponsiveDimensions().inputPadding}px;
-  font-size: ${() => getResponsiveDimensions().inputFontSize}px;
+  padding: 4%;
+  font-size: ${Math.min(width * 0.04, 16)}px;
   color: #333333;
-  min-height: ${() => getResponsiveDimensions().isVerySmallScreen ? 44 : 52}px;
+  min-height: ${height * 0.065}px;
 `;
 
 const FocusedInput = styled(StyledTextInput)`
-  border-color: #007AFF;
+  border-color: #6b7280;
   background-color: #ffffff;
 `;
 
@@ -134,23 +110,23 @@ interface ButtonProps {
 }
 
 const LoginButton = styled(TouchableOpacity)<ButtonProps>`
-  background-color: ${(props: ButtonProps) => props.disabled ? '#cccccc' : '#007AFF'};
+  background-color: ${(props: ButtonProps) => props.disabled ? '#d1d5db' : '#fff'};
   border-radius: 12px;
-  padding: ${() => getResponsiveDimensions().buttonPadding}px;
+  padding: 4.5%;
   align-items: center;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 3%;
   shadow-color: #007AFF;
   shadow-offset: 0px 4px;
   shadow-opacity: ${(props: ButtonProps) => props.disabled ? 0.1 : 0.3};
   shadow-radius: 8px;
   elevation: ${(props: ButtonProps) => props.disabled ? 2 : 6};
-  min-height: ${() => getResponsiveDimensions().isVerySmallScreen ? 48 : 56}px;
+  min-height: ${height * 0.07}px;
 `;
 
 const ButtonText = styled(Text)<ButtonProps>`
-  color: #ffffff;
-  font-size: ${() => getResponsiveDimensions().buttonFontSize}px;
+  color: #007AFF;
+  font-size: ${Math.min(width * 0.045, 18)}px;
   font-weight: 600;
 `;
 
@@ -158,66 +134,16 @@ const ErrorContainer = styled.View`
   background-color: #fee;
   border: 1px solid #fcc;
   border-radius: 8px;
-  padding: ${() => getResponsiveDimensions().isVerySmallScreen ? 10 : 12}px;
-  margin-top: 16px;
+  padding: 3%;
+  margin-top: 4%;
 `;
 
-const ErrorText = styled(Text)`
+const ErrorText = styled.Text`
   color: #cc0000;
-  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
+  font-size: ${Math.min(width * 0.035, 14)}px;
   text-align: center;
 `;
 
-// Decorative elements
-const getCircleProps = () => {
-  const { circleScale, isVerySmallScreen } = getResponsiveDimensions();
-  
-  return {
-    circles: [
-      { 
-        size: 100 * circleScale, 
-        top: isVerySmallScreen ? 40 : 60, 
-        left: -30 * circleScale, 
-        opacity: 0.1 
-      },
-      { 
-        size: 80 * circleScale, 
-        top: isVerySmallScreen ? 120 : 150, 
-        left: width - (50 * circleScale), 
-        opacity: 0.15 
-      },
-      { 
-        size: 120 * circleScale, 
-        top: height - (isVerySmallScreen ? 150 : 200), 
-        left: -40 * circleScale, 
-        opacity: 0.08 
-      },
-      { 
-        size: 90 * circleScale, 
-        top: height - (isVerySmallScreen ? 100 : 150), 
-        left: width - (60 * circleScale), 
-        opacity: 0.12 
-      },
-    ]
-  };
-};
-
-interface DecorativeCircleProps {
-  size: number;
-  top: number;
-  left: number;
-  opacity: number;
-}
-
-const DecorativeCircle = styled.View<DecorativeCircleProps>`
-  position: absolute;
-  width: ${(props: DecorativeCircleProps) => props.size}px;
-  height: ${(props: DecorativeCircleProps) => props.size}px;
-  border-radius: ${(props: DecorativeCircleProps) => props.size / 2}px;
-  background-color: rgba(255, 255, 255, ${(props: DecorativeCircleProps) => props.opacity});
-  top: ${(props: DecorativeCircleProps) => props.top}px;
-  left: ${(props: DecorativeCircleProps) => props.left}px;
-`;
 
 interface LoginProps {
   onLoggedIn: () => void;
@@ -299,27 +225,17 @@ export default function Login({ onLoggedIn }: LoginProps) {
   };
 
   const isFormValid = email.trim() !== "" && password.trim() !== "";
-  const { circles } = getCircleProps();
+
 
   return (
     <Container>
-      {/* Decorative background elements */}
-      {circles.map((circle, index) => (
-        <DecorativeCircle
-          key={index}
-          size={circle.size}
-          top={circle.top}
-          left={circle.left}
-          opacity={circle.opacity}
-        />
-      ))}
 
       <KeyboardAvoidingContainer
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        keyboardVerticalOffset={0}
       >
         <ScrollContainer
-          extraScrollHeight={20}
+          extraScrollHeight={height * 0.05}
           enableOnAndroid={true}
           enableAutomaticScroll={Platform.OS === 'ios'}
         >
@@ -332,7 +248,7 @@ export default function Login({ onLoggedIn }: LoginProps) {
                 {
                   translateY: keyboardAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, -50],
+                    outputRange: [0, -height * 0.08],
                   }),
                 },
               ],

@@ -19,6 +19,7 @@ import ShieldCheckIcon from '../../assets/ShieldCheckIcon'
 import MapPinIcon from '../../assets/MapPinIcon';
 import CircleXIcon from '../../assets/CircleXIcon';
 import MoveLeftIcon from '../../assets/MoveLeftIcon';
+import { ArrowLeft, ArrowRight, Calendar } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -108,7 +109,7 @@ const RegulationsCard = styled.View`
   shadow-opacity: 0.05;
   shadow-radius: 2px;
   elevation: 1;
-  min-height: ${height * 0.5}px;
+  min-height: 60%;
 `;
 
 const RegulationsScrollView = styled(ScrollView)`
@@ -170,28 +171,6 @@ const SectionDivider = styled.View`
   background-color: #f3f4f6;
 `;
 
-const BannerContainer = styled.View`
-  background-color: #fef3c7;
-  border-width: 1px;
-  border-color: #fde68a;
-  border-radius: 12px;
-  padding: 4%;
-  margin-top: 4%;
-`;
-
-const BannerTitle = styled.Text`
-  color: #92400e;
-  font-size: ${Math.min(width * 0.04, 16)}px;
-  font-weight: 600;
-  margin-bottom: 2%;
-`;
-
-const BannerText = styled.Text`
-  color: #92400e;
-  font-size: ${Math.min(width * 0.035, 14)}px;
-  margin-bottom: 1%;
-`;
-
 const ButtonsContainer = styled.View`
   gap: 3%;
   width: 100%;
@@ -219,21 +198,22 @@ const ErrorText = styled.Text`
   text-align: center;
 `;
 
+
+const NavigationContainer = styled.View`
+  flex-direction: row;
+  gap: 12px;
+  padding-top: 16px;
+  padding-bottom: 5px;
+  margin-top: 8px;
+`;
+
 // Icon Components
 const CalendarIconMain = () => (
   <CalendarIcon size={Math.min(width * 0.06, 24)} color="#ffffff" />
 );
 
-const CalendarIconButton = ({ color }: { color: string }) => (
-  <CalendarIcon size={16} color={color} />
-);
-
 const CalendarDaysIconButton = () => (
   <CalendarDaysIcon size={16} color="#007AFF" />
-);
-
-const BackIcon = () => (
-  <MoveLeftIcon size={16} color="#6b7280" />
 );
 
 const ChevronDownIconButton = ({ expanded }: { expanded: boolean }) => (
@@ -414,81 +394,59 @@ export const Regulations: React.FC<Props> = ({
         </ContentContainer>
       </MaxWidthContainer>
 
-      {/* Fixed Action Buttons */}
+      {/* Fixed Action Buttons - Updated to match FriendInvitation style */}
       <FixedButtonsWrapper>
         <ButtonsContainer>
-          <Button 
-            onPress={isEligible ? onReserve : undefined}
-            variant="default" 
-            size="lg" 
-            style={{ 
-              width: '100%', 
-              paddingVertical: '4%',
-              opacity: isEligible ? 1 : 0.5
-            }}
-            disabled={!isEligible}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              {isEligible ? (
-                <>
-                  <CalendarIconButton color="#ffffff" />
-                  <Text style={{ 
-                    color: '#ffffff', 
-                    fontSize: Math.min(width * 0.04, 16), 
-                    fontWeight: '500', 
-                    marginLeft: '2%' 
-                  }}>
-                    Reserve a Court
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <CalendarIconButton color="#000" />
-                  <Text style={{ 
-                    color: '#000', 
-                    fontSize: Math.min(width * 0.04, 16), 
-                    fontWeight: '500', 
-                    marginLeft: '2%' 
-                  }}>
-                    {EligReason}
-                  </Text>
-                </>
-              )}
-            </View>
-          </Button>
-          
+          {/* Main Navigation Buttons */}
+          <NavigationContainer>
+            <Button
+              variant="outline"
+              onPress={onBackHome}
+              style={{ flex: 1, paddingVertical: 14, minHeight: 48 }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <ArrowLeft size={16} color="#007AFF" />
+                <Text style={{ marginLeft: 8, color: '#007AFF' }}>Back</Text>
+              </View>
+            </Button>
+            
+            <Button
+              onPress={isEligible ? onReserve : undefined}
+              disabled={!isEligible}
+              style={{ 
+                flex: 1, 
+                paddingVertical: 14, 
+                minHeight: 48,
+                backgroundColor: isEligible ? '#007AFF' : '#f3f4f6'
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ 
+                  color: isEligible ? '#ffffff' : '#9ca3af',
+                  marginRight: 8 
+                }}>
+                  {isEligible ? 'Book Court' : EligReason || 'Not Available'}
+                </Text>
+                {isEligible && <ArrowRight size={16} color="#ffffff" />}
+              </View>
+            </Button>
+          </NavigationContainer>
+
+          {/* Secondary Action Button */}
           <Button 
             onPress={onShowReservations} 
             variant="outline" 
-            style={{ width: '100%', paddingVertical: '4%' }}
+            style={{ width: '100%', paddingVertical: 14, minHeight: 48 }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <CalendarDaysIconButton />
               <Text style={{ 
                 color: '#007AFF', 
-                fontSize: Math.min(width * 0.04, 16), 
+                fontSize: 16, 
                 fontWeight: '500', 
-                marginLeft: '2%' 
+                marginLeft: 8 
               }}>
                 Show All Reservations
-              </Text>
-            </View>
-          </Button>
-          
-          <Button 
-            onPress={onBackHome} 
-            variant="outline"
-            style={{ width: '100%', paddingVertical: '4%' }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <BackIcon />
-              <Text style={{ 
-                color: '#6b7280', 
-                fontSize: Math.min(width * 0.04, 16), 
-                fontWeight: '500', 
-                marginLeft: '2%' 
-              }}>
-                Back to Home
               </Text>
             </View>
           </Button>

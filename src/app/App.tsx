@@ -13,7 +13,7 @@ import { BookingsList } from "src/screens/BookingsList";
 import { Notifications } from "src/screens/Notifications";
 import { NotificationResponse } from "src/screens/NotificationResponse";
 
-type Route = "home" | "regulations" | "friendInvitation" | "bookings" | "notifications" | "notificationResponse";
+type Route = "home" | "regulations" | "friendInvitation" | "bookings" | "notifications" | "notificationResponse" | "selectCourt";
 
 
 export default function App() {
@@ -134,7 +134,7 @@ export default function App() {
               headerSubtitle="Nile University Sports Facilities"
               policiesTitle="Sports Facilities Policies"
               onShowReservations={() => { setRoute("bookings") }}
-              onReserve={() => setRoute("friendInvitation")}
+              onReserve={() => setRoute("selectCourt")}
               onBackHome={() => setRoute("home")}
             />
           ) : route === "bookings" ? (

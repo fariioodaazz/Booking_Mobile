@@ -1,17 +1,16 @@
 // Booking-related types
 export type Booking = {
   id: string;
-  status: string;                     
+  status: string;
   bookingDate: string;
   pendingTimestamp?: string | null;
-  isCancellable?: boolean | null;
-  facility: { id: string; info: string };
+  isMine: boolean;
+  amIParticipant: boolean;
+  isCancellable: boolean;
+  facility?: { id: string; info?: string | null };
   slot: { id: string; theHour: number };
-  participants?: Array<{
-    id: string;
-    isConfirmed: boolean;
-    user: { id: string; name: string };
-  }>;
+  owner: { id: string; name: string };
+  participants?: { isConfirmed: boolean; user: { id: string; name?: string } }[];
 };
 
 // Enhanced booking types for complete booking details

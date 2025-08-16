@@ -156,11 +156,10 @@ const BellIconButton = () => (
 type Props = {
   onBookCourt: () => void;
   onLogout: () => void;
-  onTestNotification: () => void;
   onViewNotifications: () => void;
 };
 
-export const Home: React.FC<Props> = ({ onBookCourt, onLogout, onTestNotification, onViewNotifications }) => {
+export const Home: React.FC<Props> = ({ onBookCourt, onLogout, onViewNotifications }) => {
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -235,12 +234,6 @@ export const Home: React.FC<Props> = ({ onBookCourt, onLogout, onTestNotificatio
                 <ActionButtonText>Book a Court</ActionButtonText>
               </ActionButton>
 
-              <ActionButton onPress={onTestNotification} activeOpacity={0.8}>
-                <ActionIcon>
-                  <MailboxIconButton />
-                </ActionIcon>
-                <ActionButtonText>Test Notification</ActionButtonText>
-              </ActionButton>
               
               {onViewNotifications && (
                 <ActionButton onPress={onViewNotifications} activeOpacity={0.8}>

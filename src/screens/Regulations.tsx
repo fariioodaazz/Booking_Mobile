@@ -23,6 +23,52 @@ import ArrowRight from '../../assets/ArrowRightIcon';
 
 const { width, height } = Dimensions.get('window');
 
+// Comprehensive responsive helper
+const getResponsiveDimensions = () => {
+  const isSmallScreen = width < 360;
+  const isVerySmallScreen = width < 320;
+  const isTablet = width > 768;
+  const isTallScreen = height > 800;
+  const aspectRatio = height / width;
+  const isModernPhone = aspectRatio > 2.0;
+  
+  // Calculate safe paddings and sizes
+  const basePadding = isVerySmallScreen ? 12 : isSmallScreen ? 16 : 20;
+  const containerTopPadding = Math.max(40, height * 0.05);
+  const containerBottomPadding = Math.max(80, height * 0.12);
+  const buttonAreaHeight = Math.max(200, height * 0.25); // Increased from 0.18 to 0.25
+  
+  return {
+    // Screen type flags
+    isSmallScreen,
+    isVerySmallScreen,
+    isTablet,
+    isTallScreen,
+    isModernPhone,
+    
+    // Responsive dimensions
+    basePadding,
+    containerTopPadding,
+    containerBottomPadding,
+    buttonAreaHeight,
+    
+    // Header dimensions
+    iconSize: Math.min(width * 0.14, isVerySmallScreen ? 45 : 55),
+    titleSize: Math.min(width * 0.06, isVerySmallScreen ? 18 : 24),
+    subtitleSize: Math.min(width * 0.035, isVerySmallScreen ? 12 : 16),
+    headerMarginBottom: isVerySmallScreen ? 15 : 20,
+    
+    // Content dimensions
+    cardMinHeight: Math.max(300, height * 0.4),
+    sectionPadding: basePadding,
+    sectionMinHeight: isVerySmallScreen ? 45 : 55,
+    
+    // Button dimensions
+    buttonMinHeight: isVerySmallScreen ? 44 : 48,
+    buttonFontSize: isVerySmallScreen ? 14 : 16,
+  };
+};
+
 type Props = {
   categoryName: string;
   onShowReservations: () => void;
@@ -35,12 +81,11 @@ type Props = {
   policiesTitle?: string;
 };
 
-// Styled Components with percentage-based sizing
+// Responsive Styled Components
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
-  padding-top: 8%;
-  padding-bottom: 15%;
+  padding-top: ${() => getResponsiveDimensions().containerTopPadding}px;
 `;
 
 const MaxWidthContainer = styled.View`
@@ -51,52 +96,53 @@ const MaxWidthContainer = styled.View`
 
 const HeaderContainer = styled.View`
   align-items: center;
-  margin-bottom: 4%;
-  padding-top: 5%;
+  margin-bottom: ${() => getResponsiveDimensions().headerMarginBottom}px;
+  padding-top: ${() => getResponsiveDimensions().basePadding}px;
 `;
 
 const IconContainer = styled.View`
-  width: ${width * 0.14}px;
-  height: ${width * 0.14}px;
-  border-radius: ${width * 0.07}px;
+  width: ${() => getResponsiveDimensions().iconSize}px;
+  height: ${() => getResponsiveDimensions().iconSize}px;
+  border-radius: ${() => getResponsiveDimensions().iconSize / 2}px;
   background-color: #007AFF;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2%;
+  margin-bottom: 12px;
 `;
 
 const Title = styled.Text`
   color: #007AFF;
-  font-size: ${Math.min(width * 0.06, 24)}px;
+  font-size: ${() => getResponsiveDimensions().titleSize}px;
   font-weight: 600;
-  margin-bottom: 1%;
+  margin-bottom: 8px;
   text-align: center;
 `;
 
 const Subtitle = styled.Text`
   color: #6b7280;
-  font-size: ${Math.min(width * 0.04, 16)}px;
+  font-size: ${() => getResponsiveDimensions().subtitleSize}px;
   text-align: center;
-  padding-horizontal: 5%;
+  padding-horizontal: ${() => getResponsiveDimensions().basePadding}px;
+  line-height: ${() => getResponsiveDimensions().subtitleSize * 1.4}px;
 `;
 
 const CategoryChip = styled.View`
   background-color: #007AFF10;
   border-radius: 16px;
-  padding-horizontal: 3%;
-  padding-vertical: 1.5%;
-  margin-top: 3%;
+  padding-horizontal: ${() => getResponsiveDimensions().basePadding}px;
+  padding-vertical: ${() => getResponsiveDimensions().isVerySmallScreen ? 6 : 8}px;
+  margin-top: 12px;
 `;
 
 const CategoryText = styled.Text`
   color: #007AFF;
-  font-size: ${Math.min(width * 0.035, 14)}px;
+  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
   font-weight: 500;
 `;
 
 const ContentContainer = styled.View`
   flex: 1;
-  margin-bottom: 25%;
+  margin-bottom: ${() => getResponsiveDimensions().buttonAreaHeight}px;
 `;
 
 const RegulationsCard = styled.View`
@@ -109,7 +155,8 @@ const RegulationsCard = styled.View`
   shadow-opacity: 0.05;
   shadow-radius: 2px;
   elevation: 1;
-  min-height: 60%;
+  min-height: ${() => getResponsiveDimensions().cardMinHeight}px;
+  flex: 1;
 `;
 
 const RegulationsScrollView = styled(ScrollView)`
@@ -119,30 +166,30 @@ const RegulationsScrollView = styled(ScrollView)`
 const SectionHeaderCollapsed = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding: 4%;
+  padding: ${() => getResponsiveDimensions().sectionPadding}px;
   border-bottom-width: 1px;
   border-bottom-color: #f3f4f6;
-  min-height: ${height * 0.065}px;
+  min-height: ${() => getResponsiveDimensions().sectionMinHeight}px;
 `;
 
 const SectionHeaderExpanded = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding: 4%;
-  min-height: ${height * 0.065}px;
+  padding: ${() => getResponsiveDimensions().sectionPadding}px;
+  min-height: ${() => getResponsiveDimensions().sectionMinHeight}px;
 `;
 
 const SectionIconContainer = styled.View`
   width: 24px;
   height: 24px;
-  margin-right: 3%;
+  margin-right: ${() => getResponsiveDimensions().isVerySmallScreen ? 8 : 12}px;
   align-items: center;
   justify-content: center;
 `;
 
 const SectionTitleText = styled.Text`
   color: #007AFF;
-  font-size: ${Math.min(width * 0.04, 16)}px;
+  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 14 : 16}px;
   font-weight: 500;
   flex: 1;
 `;
@@ -155,15 +202,15 @@ const ChevronContainer = styled.View`
 `;
 
 const SectionContent = styled.View`
-  padding: 0 4% 4% 4%;
+  padding: 0 ${() => getResponsiveDimensions().sectionPadding}px ${() => getResponsiveDimensions().sectionPadding}px ${() => getResponsiveDimensions().sectionPadding}px;
 `;
 
 const BulletPoint = styled.Text`
   color: #374151;
-  font-size: ${Math.min(width * 0.035, 14)}px;
-  line-height: ${Math.min(width * 0.05, 20)}px;
-  margin-bottom: 2%;
-  margin-left: 2%;
+  font-size: ${() => getResponsiveDimensions().isVerySmallScreen ? 12 : 14}px;
+  line-height: ${() => getResponsiveDimensions().isVerySmallScreen ? 18 : 20}px;
+  margin-bottom: 8px;
+  margin-left: 8px;
 `;
 
 const SectionDivider = styled.View`
@@ -172,39 +219,41 @@ const SectionDivider = styled.View`
 `;
 
 const ButtonsContainer = styled.View`
-  gap: 3%;
+  gap: ${() => getResponsiveDimensions().isVerySmallScreen ? 8 : 12}px;
   width: 100%;
 `;
 
 const FixedButtonsWrapper = styled.View`
   position: absolute;
-  bottom: 8%;
+  bottom: ${() => Math.max(20, getResponsiveDimensions().containerBottomPadding * 0.2)}px;
   left: 4%;
   right: 4%;
   align-items: center;
+  padding-top: 16px;
+  padding-bottom: 20px;
+  margin-top: 8px;
 `;
 
 const ErrorContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding: 4%;
+  padding: ${() => getResponsiveDimensions().basePadding}px;
 `;
 
 const ErrorText = styled.Text`
   color: #dc2626;
-  font-size: ${Math.min(width * 0.04, 16)}px;
-  margin-bottom: 4%;
+  font-size: ${() => getResponsiveDimensions().buttonFontSize}px;
+  margin-bottom: 16px;
   text-align: center;
 `;
 
-
 const NavigationContainer = styled.View`
   flex-direction: row;
-  gap: 12px;
-  padding-top: 16px;
-  padding-bottom: 5px;
-  margin-top: 8px;
+  gap: ${() => getResponsiveDimensions().isVerySmallScreen ? 8 : 12}px;
+  padding-top: ${() => getResponsiveDimensions().isVerySmallScreen ? 8 : 16}px;
+  padding-bottom: ${() => getResponsiveDimensions().isVerySmallScreen ? 4 : 8}px;
+  margin-top: ${() => getResponsiveDimensions().isVerySmallScreen ? 4 : 8}px;
 `;
 
 // Icon Components
@@ -364,20 +413,18 @@ export const Regulations: React.FC<Props> = ({
           </IconContainer>
           <Title>{headerTitle}</Title>
           <Subtitle>{headerSubtitle}</Subtitle>
-          {category?.name && (
-            <CategoryChip>
-              <CategoryText>{category.name}</CategoryText>
-            </CategoryChip>
-          )}
         </HeaderContainer>
 
         {/* Content Area */}
         <ContentContainer>
-          {/* Single Scrollable Regulations Card */}
+          {/* Scrollable Regulations Card */}
           <RegulationsCard>
             <RegulationsScrollView 
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ flexGrow: 1 }}
+              contentContainerStyle={{ 
+                flexGrow: 1,
+                paddingBottom: 60 // Increased from 20 to 60
+              }}
             >
               {sectionsToShow.map((section: any, index: number) => (
                 <CollapsibleSection
@@ -394,7 +441,7 @@ export const Regulations: React.FC<Props> = ({
         </ContentContainer>
       </MaxWidthContainer>
 
-      {/* Fixed Action Buttons - Updated to match FriendInvitation style */}
+      {/* Fixed Action Buttons at Bottom - Responsive */}
       <FixedButtonsWrapper>
         <ButtonsContainer>
           {/* Main Navigation Buttons */}
@@ -402,7 +449,11 @@ export const Regulations: React.FC<Props> = ({
             <Button
               variant="outline"
               onPress={onBackHome}
-              style={{ flex: 1, paddingVertical: 14, minHeight: 48 }}
+              style={{ 
+                flex: 1, 
+                paddingVertical: 14, 
+                minHeight: 48
+              }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <ArrowLeft size={16} color="#007AFF" />
@@ -416,18 +467,12 @@ export const Regulations: React.FC<Props> = ({
               style={{ 
                 flex: 1, 
                 paddingVertical: 14, 
-                minHeight: 48,
-                backgroundColor: isEligible ? '#007AFF' : '#f3f4f6'
+                minHeight: 48
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ 
-                  color: isEligible ? '#ffffff' : '#9ca3af',
-                  marginRight: 8 
-                }}>
-                  {isEligible ? 'Book Court' : EligReason || 'Not Available'}
-                </Text>
-                {isEligible && <ArrowRight size={16} color="#ffffff" />}
+                <Text style={{ color: '#ffffff' }}>{isEligible ? 'Book Court' : EligReason || 'Not Available'}</Text>
+                {isEligible && <ArrowRight size={16} color="#ffffff" style={{ marginLeft: 8 }} />}
               </View>
             </Button>
           </NavigationContainer>
@@ -436,7 +481,11 @@ export const Regulations: React.FC<Props> = ({
           <Button 
             onPress={onShowReservations} 
             variant="outline" 
-            style={{ width: '100%', paddingVertical: 14, minHeight: 48 }}
+            style={{ 
+              width: '100%', 
+              paddingVertical: 14, 
+              minHeight: 48
+            }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <CalendarDaysIconButton />

@@ -22,7 +22,6 @@ export default function App() {
   const [route, setRoute] = useState<Route>("home");
   const [selectedNotification, setSelectedNotification] = useState<any>(null);
 
-  // Friend invitation state
   const [invitedFriends, setInvitedFriends] = useState<any[]>([]);
   const [quickLists, setQuickLists] = useState<any[]>([]);
 
@@ -32,7 +31,7 @@ export default function App() {
       const hasSeenWelcome = await AsyncStorage.getItem("hasSeenWelcome");
       
       setHasToken(!!token);
-      setShowWelcome(!hasSeenWelcome && !token); // Show welcome only if user hasn't seen it and isn't logged in
+      setShowWelcome(!hasSeenWelcome && !token);
     })();
   }, []);
 
@@ -86,18 +85,12 @@ export default function App() {
     setQuickLists(prev => prev.filter(list => list.id !== listId));
   };
 
-  // Notification handlers
-  const handleTestNotification = () => {
-    console.log("Test notification triggered");
-    setRoute("notificationResponse");
-  };
 
   const handleViewNotifications = () => {
     setRoute("notifications");
   };
 
   const handleNotificationPress = (notification: any) => {
-    // Check if notification is expired
     const isExpired = notification.expiresAt && new Date(notification.expiresAt) < new Date();
     
     if (!notification.isInfo && notification.relatedBooking && !isExpired) {
@@ -122,7 +115,6 @@ export default function App() {
             <Home
               onBookCourt={() => setRoute("regulations")}
               onLogout={handleLogout}
-              onTestNotification={handleTestNotification}
               onViewNotifications={handleViewNotifications}
             />
           ) : route === "friendInvitation" ? (

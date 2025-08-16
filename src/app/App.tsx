@@ -134,7 +134,7 @@ export default function App() {
               headerSubtitle="Nile University Sports Facilities"
               policiesTitle="Sports Facilities Policies"
               onShowReservations={() => { setRoute("bookings") }}
-              onReserve={() => setRoute("selectCourt")}
+              onReserve={() => setRoute("friendInvitation")}
               onBackHome={() => setRoute("home")}
             />
           ) : route === "bookings" ? (

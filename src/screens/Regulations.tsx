@@ -18,8 +18,8 @@ import ChevronDownIcon from '../../assets/ChevronDownIcon';
 import ShieldCheckIcon from '../../assets/ShieldCheckIcon'
 import MapPinIcon from '../../assets/MapPinIcon';
 import CircleXIcon from '../../assets/CircleXIcon';
-import MoveLeftIcon from '../../assets/MoveLeftIcon';
-import { ArrowLeft, ArrowRight, Calendar } from 'lucide-react-native';
+import ArrowLeft from '../../assets/ArrowLeftIcon';
+import ArrowRight from '../../assets/ArrowRightIcon';
 
 const { width, height } = Dimensions.get('window');
 

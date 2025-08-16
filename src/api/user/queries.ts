@@ -1,24 +1,6 @@
 // app/api/user/queries.ts
 import { gql } from "@apollo/client";
 
-export const MY_BOOKINGS_QUERY = gql`
-  query MyBookings {
-    myBookings {
-      id
-      status
-      bookingDate
-      pendingTimestamp
-      isCancellable
-      facility { id info }
-      slot { id theHour }
-      participants {
-        id
-        isConfirmed
-        user { id name }
-      }
-    }
-  }
-`;
 export const MY_INVOLVED_BOOKINGS_QUERY = gql`
   query MyInvolvedBookings($status: String, $role: RoleFilterEnum!) {
     myInvolvedBookings(status: $status, role: $role) {
